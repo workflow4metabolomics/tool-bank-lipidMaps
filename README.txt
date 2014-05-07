@@ -1,5 +1,5 @@
 ## ****** Lipidmaps environnemnt : ****** ##
-# version 01 2014 M Landi / F Giacomoni
+# version 2014-05-07 M Landi / F Giacomoni
 
 ## --- PERL compilator / libraries : --- ##
 $ perl -v

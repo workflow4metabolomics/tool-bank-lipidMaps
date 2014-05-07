@@ -1,4 +1,4 @@
-<tool id="lipidmaps" name="Lipidmaps " version="1.0.0">
+<tool id="lipidmaps" name="Lipidmaps " version="2014-05-07">
 	<description> 
 		 : search on LM online with masses
 	</description>
@@ -19,7 +19,7 @@
 			-listneutralloss ${data_type.neutral_loss} -listoxidation ${data_type.oxidation}
 		#end if
 		
-		-output $output_result -view $output_view
+		-output $variableMetadata -view $LMSDResView
 		
 	</command>
 	<inputs>
@@ -1193,8 +1193,8 @@
 		<param name="tolerance" label="Delta of mass " type="float" value="0.5" size="10" help="Exact mass off set (great as +/- 0.01 to +/- 100)." />
 	</inputs>
 	<outputs>
-		<data name="output_result" format="tabular" label="lipidmaps_matrix"/>
-		<data name="output_view" format="HTML" label="lipidmaps_html"/>
+		<data name="variableMetadata" format="tabular"  label="${tool.name}_TSV"/>
+		<data name="LMSDResView" format="HTML"  label="${tool.name}_VIEW"/>
 	</outputs>
 	  <help>
 
@@ -1228,23 +1228,10 @@ Description
 Workflow position
 -----------------
 
-**Upstream tools**
 
-====== =========== ======= ============
-Name   output file format  parameter
-====== =========== ======= ============
-NA     NA          tabular NA
-====== =========== ======= ============
+.. image:: ./static/images/metabolomics/Workflow_position/lipidmaps.png
+        :width: 800
 
-
-
-**Downstream tools**
-
-====== =========== ======= =========
-Name   output file format  comments
-====== =========== ======= =========
-NA     NA          tabular NA
-====== =========== ======= =========
 
 
 -----------
@@ -1254,7 +1241,7 @@ Input files
 +-------------------------+-----------+
 | Parameter : num + label |  Format   |
 +=========================+===========+
-| 1 : list_of_masses.tab  |  tabular  |
+| 1 : variableMetadata    |  tabular  |
 +-------------------------+-----------+
 
 Constraints file : 
@@ -1315,12 +1302,12 @@ Delta of mass
 Output files
 ------------
 
-lipidmaps_matrix.tab
+lipidmaps_TSV.tabular
 	| the input file with adding lipidmaps results organized by cluster like
 	| delta::Cluster_common_name::Formula::Example_of_LM_id\|...
 	| Example 0.21::(-)::(C42H80NO6P)::LMGP01040094\|0.14::(PC_32:4)::(C40H72NO8P)::LMGP01010499\|0.20::(PC-O_30:0)+H2O2::(C38H78NO7P)+H2O2::LMGP01020012\|
 
-lipidmaps_html.html
+lipidmaps_VIEW.html
 	| A very complete LM results output with clusters.
 
 	</help>
