@@ -1228,13 +1228,9 @@ Description
 Workflow position
 -----------------
 
-**Upstream tools**
 
-====== =========== ======= ============
-Name   output file format  parameter
-====== =========== ======= ============
-NA     NA          tabular NA
-====== =========== ======= ============
+.. image:: ./static/images/metabolomics/Workflow_position/lipidmaps.png
+        :width: 800
 
 
 
