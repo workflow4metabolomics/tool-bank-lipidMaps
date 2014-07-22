@@ -1,5 +1,5 @@
 ## ****** Lipidmaps environnemnt : ****** ##
-# version 2014-05-07 M Landi / F Giacomoni
+# version 2014.07.17 M Landi / F Giacomoni
 
 ## --- PERL compilator / libraries : --- ##
 $ perl -v
@@ -29,22 +29,23 @@ use maths::operations  qw( :ALL ) ;
 --
 
 ## --- R bin and Packages : --- ##
-No interaction with R
+NA
 -- 
 
 ## --- Binary dependencies --- ##
-No interaction with binary - use only lipidmaps ws (http://www.lipidmaps.org/data/structure/LMSDSearch.php)
+NA - use only lipidmaps ws (http://www.lipidmaps.org/data/structure/LMSDSearch.php)
 --
 
 ## --- Config : --- ##
-Edit the following lines in the config file : ~/metabolomics/Identification/Banks_Queries/Lipidmaps/lipidmaps.conf
+Edit the following lines in the config file : lipidmaps.conf
 JS_GALAXY_PATH=http://YOUR_GALAXY_HOSTNAME/static/scripts/libs/outputs
 CSS_GALAXY_PATH=http://YOUR_GALAXY_HOSTNAME/static/style
 HTML_TEMPLATE=absolute_path_to_/lipidmaps.tmpl
 --
 
 ## --- XML HELP PART --- ##
-Copy the following images in ~/static/images/metabolomics : 
+one image :
+lipidmaps.png
 --
 
 ## --- DATASETS --- ##
