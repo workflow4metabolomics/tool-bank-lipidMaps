@@ -7,7 +7,7 @@ use Data::Dumper;
 use Carp ;
 use HTML::Template ;
 
-use formats::csv  qw( :ALL ) ;
+use lib::csv  qw( :ALL ) ;
 
 use Exporter;
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
