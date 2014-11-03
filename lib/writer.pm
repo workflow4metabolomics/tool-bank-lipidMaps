@@ -69,7 +69,7 @@ sub write_csv_skel {
     my $self = shift ;
     my ( $csv_file, $rows ) = @_ ;
     
-    my $ocsv = formats::csv::new() ;
+    my $ocsv = lib::csv::new() ;
 	my $csv = $ocsv->get_csv_object("\t") ;
 	$ocsv->write_csv_from_arrays($csv, $$csv_file, $rows) ;
     
