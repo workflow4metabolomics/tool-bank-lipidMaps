@@ -25,10 +25,10 @@ my $binPath = $FindBin::Bin ;
 use lib::lipidmaps ;
 use lib::parser ;
 use lib::writer ;
-
-use conf::conf  qw( :ALL ) ;
-use formats::csv  qw( :ALL ) ;
-use maths::operations  qw( :ALL ) ;
+# more inra lib
+use lib::conf  qw( :ALL ) ;
+use lib::csv  qw( :ALL ) ;
+use lib::operations  qw( :ALL ) ;
 
 ## Initialized values
 #
@@ -53,8 +53,8 @@ my ( $output_csv_file, $output_html_file, $output_link_file  ) = ( undef, undef,
 				"colmass:i"			=> \$col_mass,			# Input file Column containing Masses for query -- Mandatory
 				"colrt:i"			=> \$col_rt,			# Input file Column containing Retention time
 				"decimal:i"			=> \$decimal	,		# Significante decimal on mass -- Mandatory
-				"listoxidation:s"	=> \$list_oxidation,	## option : liste des atomes à gérer sur les masses experimentales
-				"listneutralloss:s"	=> \$list_neutral_loss,	## option : liste des atomes à gérer sur les masses experimentales
+				"listoxidation:s"	=> \$list_oxidation,	## option : liste des atomes a gerer sur les masses experimentales
+				"listneutralloss:s"	=> \$list_neutral_loss,	## option : liste des atomes a gerer sur les masses experimentales
 				"round:s" 			=> \$round_type,		# Type of truncation -- Mandatory
 				"delta:f" 			=> \$delta,				# delta of mass -- Mandatory
 				"cat:i" 			=> \$selected_cat,		# Number corresponding to the main category in LIPIDMAPS -- Optional
