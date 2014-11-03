@@ -90,7 +90,7 @@ my $nb_pages_for_html_out = 1 ;
 ## Conf file
 my ( $CONF, %RULES, %RECIPES, %TRANSFO ) = ( undef, (), (), ()  ) ;
 foreach my $conf ( <$binPath/*.conf> ) {
-	my $oConf = conf::conf::new() ;
+	my $oConf = lib::conf::new() ;
 	$CONF = $oConf->as_conf($conf) ;
 }
 
@@ -117,7 +117,7 @@ my ( $is_header, $tbody_object) = (undef, undef) ;
 if ( ( defined $input_file ) and ( -e $input_file ) ) {
 	
 	## parse all csv for later : output csv build
-	my $ocsv_input  = formats::csv->new() ;
+	my $ocsv_input  = lib::csv->new() ;
 	my $csv = $ocsv_input->get_csv_object( "\t" ) ;
 	$init_csv_rows = $ocsv_input->parse_csv_object($csv, \$input_file) ;
 	
@@ -126,21 +126,21 @@ if ( ( defined $input_file ) and ( -e $input_file ) ) {
 	
 	## parse masses
 	if ( defined $col_mass ) {
-		my $ocsv = formats::csv->new() ;
+		my $ocsv = lib::csv->new() ;
 		my $csv = $ocsv->get_csv_object( "\t" ) ;
 		$init_mzs = $ocsv->get_value_from_csv( $csv, $input_file, $col_mass, $is_header ) ; ## retrieve mz values on csv
 		$init_rts = $ocsv->get_value_from_csv( $csv, $input_file, $col_rt, $is_header ) ; ## retrieve rt values on csv
 	}
 	## round masses
 	if ( ( defined $round_type ) and ( defined $decimal ) ) {
-		my $oround = maths::operations::new() ;
+		my $oround = lib::operations::new() ;
 		if 		( $round_type eq 'truncation' ) { 	$round_init_mzs = $oround->truncate_nums( $init_mzs, $decimal ) ; 			}
 		elsif 	( $round_type eq 'round' ) {		$round_init_mzs = $oround->round_nums( $init_mzs, $decimal ) ;  			}
 		else {										croak "The selected option for data transformation is unknown !\n" ; 	}
 	}
 	## parse classif ids -- optionnal
 	if ( defined $col_classif_id ) {
-		my $ocsv = formats::csv::new() ;
+		my $ocsv = lib::csv::new() ;
 		my $csv = $ocsv->get_csv_object( "\t" ) ;
 		$classif_ids = $ocsv->get_value_from_csv( $csv, $input_file, $col_classif_id, $is_header ) ;
 	}
@@ -174,10 +174,10 @@ foreach my $init_mz (@{$round_init_mzs}) {
 	push ( @transfo_values_list, \$init_mz ) ; ## the submitted init mass
 		## work on values
 	if ( @ox_or_loss_values ) {
-		my $oround = maths::operations::new() ;
+		my $oround = lib::operations::new() ;
 		my $round_transfo_mzs = $oround->round_nums( \@ox_or_loss_values, $decimal ) ; ## We choose to around the number.
 		foreach my $transfo_mz ( @{$round_transfo_mzs} ) {
-			my $osub = maths::operations::new() ;
+			my $osub = lib::operations::new() ;
 			my $transfo_init_mz = $osub->subtract_num( $init_mz, $transfo_mz ) ;
 			push ( @transfo_values_list, $transfo_init_mz ) ;
 		}
