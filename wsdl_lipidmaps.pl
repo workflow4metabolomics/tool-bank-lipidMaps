@@ -128,8 +128,8 @@ if ( ( defined $input_file ) and ( -e $input_file ) ) {
 	if ( defined $col_mass ) {
 		my $ocsv = lib::csv->new() ;
 		my $csv = $ocsv->get_csv_object( "\t" ) ;
-		$init_mzs = $ocsv->get_value_from_csv( $csv, $input_file, $col_mass, $is_header ) ; ## retrieve mz values on csv
-		$init_rts = $ocsv->get_value_from_csv( $csv, $input_file, $col_rt, $is_header ) ; ## retrieve rt values on csv
+		$init_mzs = $ocsv->get_value_from_csv_multi_header( $csv, $input_file, $col_mass, $is_header, $line_header ) ; ## retrieve mz values on csv
+		$init_rts = $ocsv->get_value_from_csv_multi_header( $csv, $input_file, $col_rt, $is_header, $line_header ) ; ## retrieve rt values on csv
 	}
 	## round masses
 	if ( ( defined $round_type ) and ( defined $decimal ) ) {
@@ -142,7 +142,7 @@ if ( ( defined $input_file ) and ( -e $input_file ) ) {
 	if ( defined $col_classif_id ) {
 		my $ocsv = lib::csv::new() ;
 		my $csv = $ocsv->get_csv_object( "\t" ) ;
-		$classif_ids = $ocsv->get_value_from_csv( $csv, $input_file, $col_classif_id, $is_header ) ;
+		$classif_ids = $ocsv->get_value_from_csv( $csv, $input_file, $col_classif_id, $is_header, $line_header ) ;
 	}
 	
 	## Uses N mz and theirs entries per page (see config file).
