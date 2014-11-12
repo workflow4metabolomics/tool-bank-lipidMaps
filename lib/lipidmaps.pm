@@ -103,7 +103,7 @@ sub get_lm_mass_query {
     my $rest_query = $$query.$$mass ;
     
     $result = get($rest_query) ;
-	die "Can't GET the folowing mz query: $rest_query!" if ( ! defined $result ) ;
+	die "Can't GET the folowing mz query: $rest_query!" if ( ! defined $rest_query ) ;
     
     return(\$result, \$rest_query) ;
 }
@@ -661,7 +661,7 @@ sub getSimpleNameFromCommonName {
 }
 ### END of SUB
 
-## Fonction : permet de reconstruire un nom simple à partir de données
+## Fonction : permet de reconstruire un nom simple a partir de donnees
 ## Input : $CommonName, $Group, $Ch1_C, $Ch1_i, $Ch2_C, $Ch2_i, $Ch3_C, $Ch3_i, $Ox, $Post
 ## Ouput : $SimpleName
 sub setSimpleName {
@@ -714,7 +714,7 @@ sub getSimpleCommonName_Old {
     my ( $CommonName ) = @_;
     my ($Groupe, $Familly, $cTotal, $iTotal, $Reste, $Ox ) = ( undef, undef, undef, undef, undef, undef, undef ) ;
     
-    if ( $CommonName =~/([A-Za-z|0-9|\-]*)\((.*)\)$/ ) { #" Attention Common name conteint parfois des espaces en début"
+    if ( $CommonName =~/([A-Za-z|0-9|\-]*)\((.*)\)$/ ) { #" Attention Common name conteint parfois des espaces en debut"
     	## retrieve $Familly and $Reste
     	( $Familly, $Reste, $Groupe) = ( $1, $2, '' ) ;
     	my ( $Ch1_C, $Ch2_C, $Ch1_i, $Ch2_i ) = ( 0, 0, 0, 0 ) ;
@@ -797,7 +797,7 @@ sub getSimpleCommonName_Old {
 }
 ### END of SUB
 
-## Fonction : permet de regrouper les composes ayant le même commona name simplifié
+## Fonction : permet de regrouper les composes ayant le meme commona name simplifie
 ## Input : 
 ## Ouput :
 sub clusteringCommonName {
@@ -832,7 +832,7 @@ sub clusteringCommonName {
 				next ;
 			}
     	}
-    	else { # Gere le cas ou la key du hash courant est le nombre d'entrées...
+    	else { # Gere le cas ou la key du hash courant est le nombre d'entrees...
     		next ;
     	}
     }

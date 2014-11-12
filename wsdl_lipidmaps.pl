@@ -25,10 +25,10 @@ my $binPath = $FindBin::Bin ;
 use lib::lipidmaps ;
 use lib::parser ;
 use lib::writer ;
-
-use conf::conf  qw( :ALL ) ;
-use formats::csv  qw( :ALL ) ;
-use maths::operations  qw( :ALL ) ;
+# more inra lib
+use lib::conf  qw( :ALL ) ;
+use lib::csv  qw( :ALL ) ;
+use lib::operations  qw( :ALL ) ;
 
 ## Initialized values
 #
@@ -38,14 +38,14 @@ my ( $col_classif_id, $selected_cat, $selected_cl, $selected_subcl ) = ( undef, 
 my ( $output_csv_file, $output_html_file, $output_link_file  ) = ( undef, undef, undef ) ;
 
 # for test ONLY !
-#( $input_file, $line_header, $col_mass, $col_rt, $decimal, $round_type, $delta )  = ('E:\\TESTs\\galaxy\\lipidmaps\\test_lipidmaps_avec_class_short.csv', 1, 2, 3, 2, 'round', 0.5 ) ;
+#( $input_file, $line_header, $col_mass, $col_rt, $decimal, $round_type, $delta )  = ('/Users/fgiacomoni/Inra/labs/tests/galaxy/lipidmaps/test_lipidmaps_avec_class_short.csv', 1, 2, 3, 2, 'round', 0.5 ) ;
 #( $list_oxidation, $list_neutral_loss ) = ( 'loss_O,loss_2O,NA', 'loss_hydroperoxide,loss_water' ) ;
 #( $list_oxidation, $list_neutral_loss ) = ( 'NA','NA,loss_hydroperoxide,loss_water' ) ;
 #( $selected_cat, $selected_cl, $selected_subcl ) = ( 3, 301, 30103 ) ;
 #( $selected_cat, $selected_cl, $selected_subcl ) = ( 3, 'NA_3', 'NA_301' ) ;
 #( $col_classif_id ) = 4 ;
-#( $output_html_file ) = ('E:\\TESTs\\galaxy\\lm.html') ;
-#( $output_csv_file ) = ('E:\\TESTs\\galaxy\\lm.csv') ;
+#( $output_html_file ) = ('/Users/fgiacomoni/Inra/labs/tests/galaxy/lipidmaps/lm.html') ;
+#( $output_csv_file ) = ('/Users/fgiacomoni/Inra/labs/tests/galaxy/lipidmaps/lm.csv') ;
 
 &GetOptions ( 	"help|h"     		=> \$help,       		# HELP
 				"input|i:s"			=> \$input_file,		# path for input file (CSV format) -- Mandatory
@@ -53,8 +53,8 @@ my ( $output_csv_file, $output_html_file, $output_link_file  ) = ( undef, undef,
 				"colmass:i"			=> \$col_mass,			# Input file Column containing Masses for query -- Mandatory
 				"colrt:i"			=> \$col_rt,			# Input file Column containing Retention time
 				"decimal:i"			=> \$decimal	,		# Significante decimal on mass -- Mandatory
-				"listoxidation:s"	=> \$list_oxidation,	## option : liste des atomes à gérer sur les masses experimentales
-				"listneutralloss:s"	=> \$list_neutral_loss,	## option : liste des atomes à gérer sur les masses experimentales
+				"listoxidation:s"	=> \$list_oxidation,	## option : liste des atomes a gerer sur les masses experimentales
+				"listneutralloss:s"	=> \$list_neutral_loss,	## option : liste des atomes a gerer sur les masses experimentales
 				"round:s" 			=> \$round_type,		# Type of truncation -- Mandatory
 				"delta:f" 			=> \$delta,				# delta of mass -- Mandatory
 				"cat:i" 			=> \$selected_cat,		# Number corresponding to the main category in LIPIDMAPS -- Optional
@@ -90,7 +90,7 @@ my $nb_pages_for_html_out = 1 ;
 ## Conf file
 my ( $CONF, %RULES, %RECIPES, %TRANSFO ) = ( undef, (), (), ()  ) ;
 foreach my $conf ( <$binPath/*.conf> ) {
-	my $oConf = conf::conf::new() ;
+	my $oConf = lib::conf::new() ;
 	$CONF = $oConf->as_conf($conf) ;
 }
 
@@ -117,7 +117,7 @@ my ( $is_header, $tbody_object) = (undef, undef) ;
 if ( ( defined $input_file ) and ( -e $input_file ) ) {
 	
 	## parse all csv for later : output csv build
-	my $ocsv_input  = formats::csv->new() ;
+	my $ocsv_input  = lib::csv->new() ;
 	my $csv = $ocsv_input->get_csv_object( "\t" ) ;
 	$init_csv_rows = $ocsv_input->parse_csv_object($csv, \$input_file) ;
 	
@@ -126,21 +126,21 @@ if ( ( defined $input_file ) and ( -e $input_file ) ) {
 	
 	## parse masses
 	if ( defined $col_mass ) {
-		my $ocsv = formats::csv->new() ;
+		my $ocsv = lib::csv->new() ;
 		my $csv = $ocsv->get_csv_object( "\t" ) ;
 		$init_mzs = $ocsv->get_value_from_csv( $csv, $input_file, $col_mass, $is_header ) ; ## retrieve mz values on csv
 		$init_rts = $ocsv->get_value_from_csv( $csv, $input_file, $col_rt, $is_header ) ; ## retrieve rt values on csv
 	}
 	## round masses
 	if ( ( defined $round_type ) and ( defined $decimal ) ) {
-		my $oround = maths::operations::new() ;
+		my $oround = lib::operations::new() ;
 		if 		( $round_type eq 'truncation' ) { 	$round_init_mzs = $oround->truncate_nums( $init_mzs, $decimal ) ; 			}
 		elsif 	( $round_type eq 'round' ) {		$round_init_mzs = $oround->round_nums( $init_mzs, $decimal ) ;  			}
 		else {										croak "The selected option for data transformation is unknown !\n" ; 	}
 	}
 	## parse classif ids -- optionnal
 	if ( defined $col_classif_id ) {
-		my $ocsv = formats::csv::new() ;
+		my $ocsv = lib::csv::new() ;
 		my $csv = $ocsv->get_csv_object( "\t" ) ;
 		$classif_ids = $ocsv->get_value_from_csv( $csv, $input_file, $col_classif_id, $is_header ) ;
 	}
@@ -174,10 +174,10 @@ foreach my $init_mz (@{$round_init_mzs}) {
 	push ( @transfo_values_list, \$init_mz ) ; ## the submitted init mass
 		## work on values
 	if ( @ox_or_loss_values ) {
-		my $oround = maths::operations::new() ;
+		my $oround = lib::operations::new() ;
 		my $round_transfo_mzs = $oround->round_nums( \@ox_or_loss_values, $decimal ) ; ## We choose to around the number.
 		foreach my $transfo_mz ( @{$round_transfo_mzs} ) {
-			my $osub = maths::operations::new() ;
+			my $osub = lib::operations::new() ;
 			my $transfo_init_mz = $osub->subtract_num( $init_mz, $transfo_mz ) ;
 			push ( @transfo_values_list, $transfo_init_mz ) ;
 		}
