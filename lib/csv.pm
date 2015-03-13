@@ -118,6 +118,49 @@ sub get_value_from_csv {
 }
 ## END of SUB
 
+=head2 METHOD get_value_from_csv_multi_header
+
+	## Description : extract a targeted column in a csv file 
+	## Input : $csv, $file, $column, $is_header, $nb_header
+	## Output : $value
+	## Usage : my ( $value ) = get_value_from_csv_multi_header( $csv, $file, $column, $is_header, $nb_header ) ;
+	
+=cut
+## START of SUB
+sub get_value_from_csv_multi_header {
+	## Retrieve Values
+    my $self = shift ;
+    my ( $csv, $file, $column, $is_header, $nb_header ) = @_ ;
+    
+    my @value = () ;
+    
+    ## Adapte the number of the colunm : (nb of column to position in array)
+	$column = $column - 1 ;
+    
+    open (CSV, "<", $file) or die $! ;
+	
+	my $line = 0 ;
+	
+	while (<CSV>) {
+		$line++ ;
+	    chomp $_ ;
+		# file has a header
+		if ( defined $is_header and $is_header eq 'yes') { if ($line <= $nb_header) { next ; } }
+		# parsing the targeted column
+	    if ( $csv->parse($_) ) {
+	        my @columns = $csv->fields();
+	        push ( @value, $columns[$column] ) ;
+	    }
+	    else {
+	        my $err = $csv->error_input;
+	        die "Failed to parse line: $err";
+	    }
+	}
+	close CSV;
+    return(\@value) ;
+}
+## END of SUB
+
 =head2 METHOD parse_csv_object
 
 	## Description : parse_all csv object and return a array of rows

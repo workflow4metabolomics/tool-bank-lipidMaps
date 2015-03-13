@@ -23,7 +23,7 @@
 		
 	</command>
 	<inputs>
-		<param name="file_input" label="Input file with mass list " format="tabular" type="data" help="A tabular/csv file is needed and can contains a header line."/>
+		<param name="file_input" label="File of masses (Variable Metadata) " format="tabular" type="data" help="A tabular/csv file is needed and can contains a header line."/>
 		<param name="lineheader" label="Number of header lines " type="integer" value="0" size="10" help="number of lines not containing values"/>
 		<param name="col_mass" label="Masses Column " type="data_column" data_ref="file_input" accept_default="true" help="select the column in your input file."/>
 		<param name="col_rt" label="Retention time Column " type="data_column" data_ref="file_input" accept_default="true" help="select the column in your input file."/>
