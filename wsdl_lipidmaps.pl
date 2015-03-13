@@ -94,6 +94,9 @@ foreach my $conf ( <$binPath/*.conf> ) {
 	$CONF = $oConf->as_conf($conf) ;
 }
 
+## -------------- HTML template file ------------------------ :
+foreach my $html_template ( <$binPath/*.tmpl> ) { $CONF->{'HTML_TEMPLATE'} = $html_template ; }
+
 ## work with it :
 ## get RULES lists :
 foreach (keys (%$CONF)) {
