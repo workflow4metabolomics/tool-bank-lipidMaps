@@ -22,10 +22,10 @@ use LWP::Simple ;
 use HTML::Template ;
 use XML::Twig;
 
-# libs pfem PERL : include the lib called pfem-perl in your PERL5LIB path. This lib is available in the ABIMS toolshed "Tool Dependency Packages" category.
-use conf::conf  qw( :ALL ) ;
-use formats::csv  qw( :ALL ) ;
-use maths::operations  qw( :ALL ) ;
+# libs pfem PERL : libs are now integrated
+use lib::conf  qw( :ALL ) ;
+use lib::csv  qw( :ALL ) ;
+use lib::operations  qw( :ALL ) ;
 --
 
 ## --- R bin and Packages : --- ##
@@ -40,7 +40,6 @@ NA - use only lipidmaps ws (http://www.lipidmaps.org/data/structure/LMSDSearch.p
 Edit the following lines in the config file : lipidmaps.conf
 JS_GALAXY_PATH=http://YOUR_GALAXY_HOSTNAME/static/scripts/libs/outputs
 CSS_GALAXY_PATH=http://YOUR_GALAXY_HOSTNAME/static/style
-HTML_TEMPLATE=absolute_path_to_/lipidmaps.tmpl
 --
 
 ## --- XML HELP PART --- ##
