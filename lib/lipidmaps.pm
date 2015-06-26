@@ -110,9 +110,9 @@ sub get_lm_mass_query {
 	if ($result->is_error) {
 		croak "$result->status_line \n" ;
 	}
-	else {
-		print Dumper $result->content ;
-	}
+#	else {
+#		print Dumper $result->content ;
+#	}
 
     return(\$result->content, \$rest_query) ;
 }
