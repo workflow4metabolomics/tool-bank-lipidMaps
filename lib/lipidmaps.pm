@@ -5,7 +5,7 @@ use warnings;
 
 use Data::Dumper;
 use Carp ;
-use LWP::Simple ;
+use LWP::UserAgent ;
 
 use Exporter;
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
@@ -102,10 +102,19 @@ sub get_lm_mass_query {
     my $result = undef ;
     my $rest_query = $$query.$$mass ;
     
-    $result = get($rest_query) ;
+#    print "QUERY_".$rest_query."_STOP\n" ;
+    my $browser = LWP::UserAgent->new;
+    $result = $browser->get($rest_query) ;
 	die "Can't GET the folowing mz query: $rest_query!" if ( ! defined $rest_query ) ;
-    
-    return(\$result, \$rest_query) ;
+	
+	if ($result->is_error) {
+		croak "$result->status_line \n" ;
+	}
+	else {
+		print Dumper $result->content ;
+	}
+
+    return(\$result->content, \$rest_query) ;
 }
 ## END of SUB
 
