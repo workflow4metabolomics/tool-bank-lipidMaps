@@ -168,6 +168,8 @@ if ( @{$loss_values} ) 	{ 	push( @ox_or_loss_values, @{$loss_values} ) ;  push( 
 
 # prepare a list of masses indpt of modif (ox/neutral loss) presence.
 my $init_mz_index = 0 ;
+my $i = 0 ;
+
 foreach my $init_mz (@{$round_init_mzs}) {
 	
 	my @transfo_values_list = () ;
@@ -201,7 +203,7 @@ foreach my $init_mz (@{$round_init_mzs}) {
 	push ( @transfo_annotations, \@transfo_name_list ) ;
 	
 	## foreach transfo mass (round and/or modif)
-	my $i = 0 ;
+	
 	my ( @queries, @query_results, @query_result_entries, @query_result_entry_nbs, @query_result_clusters ) = ( (), (), (), (), () ) ;
 	
 	foreach my $transfo_mz ( @{$transfo_init_mzs[$init_mz_index]} ) {
@@ -214,6 +216,7 @@ foreach my $init_mz (@{$round_init_mzs}) {
 			
 		## get the classif level :
 		if ( defined $classif_ids ) {
+
 			if ( $classif_ids->[$i] ) {
 				my $olevel = lib::parser::new() ;
 				$cat = $olevel->set_category( $classif_ids->[$i] ) ;
@@ -239,7 +242,7 @@ foreach my $init_mz (@{$round_init_mzs}) {
 		## set entries clusters
 		my ( $http_result_mz, $http_query_mz ) = $oquery->get_lm_mass_query($ref_http_query, $transfo_mz) ; ## execute the query, return a list of non-splited lm_entries.
 		my ( $mz_entries_results, $mz_entries_nb, $mz_clusters_results ) = ( undef, undef, undef ) ;
-		if ( $$http_result_mz ne '' ) { # avoid empty LM results
+		if ( (defined $http_result_mz) and ( $$http_result_mz ne '' ) ) { # avoid empty LM results
 			( $mz_entries_results, $mz_entries_nb ) = $oquery->get_lm_entry_object($http_result_mz, $transfo_mz) ; ## get all features of each entry and return a list of features keept in a hash
 			$mz_clusters_results = $oquery->get_cluster_object($mz_entries_results, \%RULES, \%RECIPES) ; ## clustering all entries and return a list of clusters keept in a hash
 		}
@@ -252,16 +255,18 @@ foreach my $init_mz (@{$round_init_mzs}) {
 		push( @query_result_entries, $mz_entries_results ) ;
 		push( @query_result_entry_nbs, $mz_entries_nb ) ;
 		push( @query_result_clusters, $mz_clusters_results ) ;
+		
 	} ## end foreach transfo_mz
 	
-	$i++ ; # implem the mz rank	
+	$i++ ; # implem the mz rank
+	
 	push( @transfo_init_mz_queries, \@queries ) ;
 	push( @transfo_init_mz_results, \@query_results ) ;
 	push( @entries_results, \@query_result_entries ) ;
 	push( @entries_total_nb, \@query_result_entry_nbs ) ;
 	push( @clusters_results, \@query_result_clusters ) ;
 	
-	$init_mz_index++ ;
+	$init_mz_index++ ;	
 } ## end foreach init_mz
 
 
