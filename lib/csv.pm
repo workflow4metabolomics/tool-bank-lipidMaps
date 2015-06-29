@@ -100,11 +100,12 @@ sub get_value_from_csv {
 	
 	while (<CSV>) {
 		$line++ ;
-	    chomp $_ ;
+	    my $line_value =  $_ ;
+        $line_value =~ s/\r//g ;
 		# file has a header
 		if ( defined $is_header ) { if ($line == 1) { next ; } }
 		# parsing the targeted column
-	    if ( $csv->parse($_) ) {
+	    if ( $csv->parse($line_value) ) {
 	        my @columns = $csv->fields();
 	        push ( @value, $columns[$column] ) ;
 	    }
@@ -143,11 +144,12 @@ sub get_value_from_csv_multi_header {
 	
 	while (<CSV>) {
 		$line++ ;
-	    chomp $_ ;
+	    my $line_value =  $_ ;
+        $line_value =~ s/\r//g ;
 		# file has a header
 		if ( defined $is_header and $is_header eq 'yes') { if ($line <= $nb_header) { next ; } }
 		# parsing the targeted column
-	    if ( $csv->parse($_) ) {
+	    if ( $csv->parse($line_value) ) {
 	        my @columns = $csv->fields();
 	        push ( @value, $columns[$column] ) ;
 	    }
