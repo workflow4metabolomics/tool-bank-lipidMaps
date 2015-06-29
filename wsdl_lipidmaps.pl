@@ -222,22 +222,22 @@ foreach my $init_mz (@{$round_init_mzs}) {
 				$cat = $olevel->set_category( $classif_ids->[$i] ) ;
 				$cl = $olevel->set_class( $classif_ids->[$i] ) ;
 				$subcl = $olevel->set_subclass( $classif_ids->[$i] ) ;
-				( $cat, $cl, $subcl ) = ( $$cat, $$cl, $$subcl ) ;
+#				( $cat, $cl, $subcl ) = ( $$cat, $$cl, $$subcl ) ;
 			}
 			else { croak "This information is not available in your parsing ids\n" ; }
 		}
 		else {
 			if ( ( defined $selected_subcl) or ( defined $selected_cl ) or ( defined $selected_cat ) ) {
-				if ( ( $selected_cat !~ /^NA(.*)/ ) ) { ( $cat ) = ( $selected_cat ) ; }
-				if ( ( $selected_cl !~ /^NA(.*)/ ) ) { ( $cl ) = ( $selected_cl ) ; }
-				if ( ( $selected_subcl !~ /^NA(.*)/ ) ) { ( $subcl ) = ( $selected_subcl ) ; }
+				if ( ( $selected_cat !~ /^NA(.*)/ ) ) { ( $cat ) = ( \$selected_cat ) ; }
+				if ( ( $selected_cl !~ /^NA(.*)/ ) ) { ( $cl ) = ( \$selected_cl ) ; }
+				if ( ( $selected_subcl !~ /^NA(.*)/ ) ) { ( $subcl ) = ( \$selected_subcl ) ; }
 			}
 			else { croak "No selected category or classification ids list\n" ; }
 		}
 		
 		## buid and get http query :
 		my $oquery = lib::lipidmaps::new() ;
-		my $ref_http_query = $oquery->build_lm_mass_query( $CONF->{'SEARCH_URL'}, $delta, $cat, $cl, $subcl ) ; ## build the query for LM WS, return a list of http, get method
+		my $ref_http_query = $oquery->build_lm_mass_query( \$CONF->{'SEARCH_URL'}, \$delta, $cat, $cl, $subcl ) ; ## build the query for LM WS, return a list of http, get method
 		
 		## set entries clusters
 		my ( $http_result_mz, $http_query_mz ) = $oquery->get_lm_mass_query($ref_http_query, $transfo_mz) ; ## execute the query, return a list of non-splited lm_entries.

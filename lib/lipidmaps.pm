@@ -71,10 +71,10 @@ sub build_lm_mass_query {
     #Mode=ProcessTextSearch&OutputMode=File&OutputType=TSV&CoreClass=3&MainClass=303&SubClass=30301&ExactMass=1000.05&ExactMassOffSet=0.5'
     
     if ( defined $url ) {
-    	if ( defined $cat ) { $query = $url.'&CoreClass='.$cat ; }
-	    if ( defined $cl ) { $query .= '&MainClass='.$cl ; }
-	    if ( defined $subcl ) { $query .= '&SubClass='.$subcl ; }
-	    if ( defined $delta ) { $query .= '&ExactMassOffSet='.$delta ; }
+    	if ( defined $$cat ) { $query = $$url.'&CoreClass='.$$cat ; }
+	    if ( defined $$cl ) { $query .= '&MainClass='.$$cl ; }
+	    if ( defined $$subcl ) { $query .= '&SubClass='.$$subcl ; }
+	    if ( defined $delta ) { $query .= '&ExactMassOffSet='.$$delta ; }
 	    ## and prepare the mass param :
 	    $query .= '&ExactMass=' ;
     }
