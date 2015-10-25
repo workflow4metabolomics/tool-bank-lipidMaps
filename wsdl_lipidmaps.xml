@@ -72,6 +72,7 @@
 					  <option value="6">Prenol Lipids [PR]</option>
 					  <option value="7">Saccharolipids [SL]</option>
 					  <option value="8">Polyketides [PK]</option>
+					  <option value="NA" selected="True">No category selected</option>
 				   </param>
 				   <when value="1">
 					  <conditional name="select_class">
