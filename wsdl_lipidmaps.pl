@@ -228,7 +228,7 @@ foreach my $init_mz (@{$round_init_mzs}) {
 		}
 		else {
 			if ( ( defined $selected_subcl) or ( defined $selected_cl ) or ( defined $selected_cat ) ) {
-				if ( ( $selected_cat !~ /^NA(.*)/ ) ) { ( $cat ) = ( \$selected_cat ) ; }
+				if ( ( $selected_cat !~ /^NA/ ) ) { ( $cat ) = ( \$selected_cat ) ; }
 				if ( ( $selected_cl !~ /^NA(.*)/ ) ) { ( $cl ) = ( \$selected_cl ) ; }
 				if ( ( $selected_subcl !~ /^NA(.*)/ ) ) { ( $subcl ) = ( \$selected_subcl ) ; }
 			}
