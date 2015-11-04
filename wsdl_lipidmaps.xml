@@ -72,8 +72,22 @@
 					  <option value="6">Prenol Lipids [PR]</option>
 					  <option value="7">Saccharolipids [SL]</option>
 					  <option value="8">Polyketides [PK]</option>
-					  <option value="NA" selected="True">No category selected</option>
+					  <option value="NA_0" selected="True">No category selected</option>
 				   </param>
+				   <when value="NA_0">
+				   		<conditional name="select_class">
+				   	  		<param name="filter_class" label="Select a Lipid main class for your query " type="select">
+				   	  			<option value="NA_1">No main class selected</option>
+							</param>
+							<when value="NA_1">
+								<conditional name="select_subclass">
+							   		<param name="filter_subclass" label="Select a Lipid subclass for your query " type="select">
+								  		<option value="NA_100">No subclass available</option>
+							   		</param>
+								</conditional>
+						 	</when>
+						</conditional>
+				   </when>
 				   <when value="1">
 					  <conditional name="select_class">
 						 <param name="filter_class" label="Select a Lipid main class for your query " type="select">
