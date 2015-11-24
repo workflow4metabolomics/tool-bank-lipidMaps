@@ -72,8 +72,22 @@
 					  <option value="6">Prenol Lipids [PR]</option>
 					  <option value="7">Saccharolipids [SL]</option>
 					  <option value="8">Polyketides [PK]</option>
-					  <option value="NA" selected="True">No category selected</option>
+					  <option value="NA_0" selected="True">No category selected</option>
 				   </param>
+				   <when value="NA_0">
+				   		<conditional name="select_class">
+				   	  		<param name="filter_class" label="Select a Lipid main class for your query " type="select">
+				   	  			<option value="NA_1">No main class selected</option>
+							</param>
+							<when value="NA_1">
+								<conditional name="select_subclass">
+							   		<param name="filter_subclass" label="Select a Lipid subclass for your query " type="select">
+								  		<option value="NA_100">No subclass available</option>
+							   		</param>
+								</conditional>
+						 	</when>
+						</conditional>
+				   </when>
 				   <when value="1">
 					  <conditional name="select_class">
 						 <param name="filter_class" label="Select a Lipid main class for your query " type="select">
@@ -1223,6 +1237,8 @@ Description
  | This tool accesses to Structure Database (LMSD) by the LMSDRecord.php service.
  | It supports retrieval of detailed information for a specific lipid with a valid LMID.
  | Searches on LMSD using a variety of parameters specified below.
+ | 
+ | LMSD querying is very long because LMSD do not allow to hit its server more often than once per 20 seconds. LMSD may have to kill scripts that hit its server more frequently.
 
 
 -----------------
@@ -1310,6 +1326,24 @@ lipidmaps_TSV.tabular
 
 lipidmaps_VIEW.html
 	| A very complete LM results output with clusters.
+
+	
+---------------
+Working example
+---------------
+
+
+.. class:: warningmark
+
+Refer to the corresponding `"W4M HowTo" &lt;http://workflow4metabolomics.org/howto&gt;`_ page:
+ | Format Data For Postprocessing
+ | Perform LCMS Annotations
+
+.. class:: warningmark
+
+And their "W4M courses 2015":
+ | Using Galaxy4Metabolomics - W4M table format for Galaxy
+ | Les banques d'annotation - Annotation  
 
 	</help>
 </tool>

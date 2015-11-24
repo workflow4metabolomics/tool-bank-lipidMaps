@@ -192,7 +192,7 @@ sub get_cluster_object {
     		my ( $group ) =  $self->set_group($g1, $g2, $g3) ;
     		
     		## set cluster object
-    		$cluster{CLUSTER_NAME} = $self->set_cluster_name($group, $total_c, $total_i, $ox, $post, $entry->{COMMON_NAME} ) ;
+    		$cluster{CLUSTER_NAME} = $self->set_cluster_name($group, $total_c, $total_i, \$ox, \$post, $entry->{COMMON_NAME} ) ;
     		$entry->{CLUSTER_NAME} = $cluster{CLUSTER_NAME} ;
     		$cluster{CLUSTER_DELTA} = $entry->{DELTA} ;
     		$cluster{FORMULA} = $entry->{FORMULA} ;
@@ -387,7 +387,7 @@ sub parse_lm_common_name {
 	## Retrieve Values
     my $self = shift ;
     my ( $lm_common_name, $RULES, $RECIPES ) = @_ ;
-    my ( $Gp1, $Gp2, $Gp3, $Ch1_C, $Ch1_i, $Ch2_C, $Ch2_i, $Ch3_C, $Ch3_i, $Ox, $Post ) ;
+    my ( $Gp1, $Gp2, $Gp3, $Ch1_C, $Ch1_i, $Ch2_C, $Ch2_i, $Ch3_C, $Ch3_i, $Ox, $Post ) = ( undef, undef, undef, undef, undef, undef, undef, undef, undef, undef, undef) ;
     my $rule_nb = 0 ;
     
     my $common_name = $$lm_common_name ;
@@ -404,10 +404,10 @@ sub parse_lm_common_name {
 			$rule_nb = $1 ;
 			push ( @matches, ($common_name =~ m/$RULES->{$rule}/g) ) ; # catch all matches in the regex
 			
-			my ($v1, $v2, $v3, $v4, $v5, $v6, $v7, $v8, $v9) = split(/,/, $RECIPES->{'RECIPE'.$rule_nb}) ;
+			my ($v1, $v2, $v3, $v4, $v5, $v6, $v7, $v8, $v9, $v10, $v11 ) = split(/,/, $RECIPES->{'RECIPE'.$rule_nb}) ;
 			( $Gp1, $Gp2, $Gp3 ) = ( $matches[$v1], $matches[$v2], $matches[$v3] ) ;
-			( $Ch1_C, $Ch1_i, $Ch2_C, $Ch2_i, $Ch3_C, $Ch3_i ) = ( $matches[$v4], $matches[$v5], $matches[$v6], $matches[$v7] ) ;
-			( $Ox, $Post ) = ( $matches[$v8], $matches[$v9] ) ;
+			( $Ch1_C, $Ch1_i, $Ch2_C, $Ch2_i, $Ch3_C, $Ch3_i ) = ( $matches[$v4], $matches[$v5], $matches[$v6], $matches[$v7], $matches[$v8], $matches[$v9] ) ;
+			( $Ox, $Post ) = ( $matches[$v10], $matches[$v11] ) ;
 			if (scalar (@matches) > 1) { last ; } # get out of the loop
 		}
     }
@@ -512,7 +512,7 @@ sub set_cluster_name {
 			if ( defined $$post ) { $cluster_name = $cluster_name.$$post ;	}
 		}
 	elsif ( ( defined $$group ) ) { 	$cluster_name = $$group ; 			}
-	else { $cluster_name = $$common_name }
+	else { $cluster_name = $$common_name ; }
     
     return(\$cluster_name) ;
 }
