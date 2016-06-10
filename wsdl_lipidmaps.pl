@@ -11,6 +11,7 @@ use Data::Dumper ;
 use POSIX ;
 use XML::Twig;
 use Getopt::Long ;
+use Time::HiRes;
 
 
 ## Permet de localisez le repertoire du script perl d'origine
@@ -218,7 +219,7 @@ foreach my $init_mz (@{$round_init_mzs}) {
 		## LM recommandation : If you write a script to automate calls to LMSD, 
 		# please be kind and do not hit our server more often than once per 20 seconds.
 		# We may have to kill scripts that hit our server more frequently.
-		sleep (20) ; 
+		Time::HiRes::sleep(0.1); #.1 seconds 
 		my ( $cat, $cl, $subcl ) = ( undef, undef, undef ) ;
 	#	if ( $i >= ( scalar( @transfos_values )-1 ) ) { $i = 0 ; } ## manage the modif for each masses.
 			
