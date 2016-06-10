@@ -157,7 +157,8 @@ if ( ( defined $input_file ) and ( -e $input_file ) ) {
 	
 	## Uses N mz and theirs entries per page (see config file).
 	# how many pages you need with your input mz list?
-	$nb_pages_for_html_out = ceil( scalar(@{$init_mzs} ) / $CONF->{HTML_ENTRIES_PER_PAGE} )  ;
+#	$nb_pages_for_html_out = ceil( scalar(@{$init_mzs} ) / $CONF->{HTML_ENTRIES_PER_PAGE} )  ;
+#	print "[INFO] Your analysis will generate $nb_pages_for_html_out pages of results...\n" if ($verbose == 3);
 	
 }
 else {
@@ -286,12 +287,23 @@ foreach my $init_mz (@{$round_init_mzs}) {
 
 # prepare data and write html output :
 if ( defined $output_html_file) {
+	## Adjust html output with only mz with records
+	my ($nb_pages, $total_entries) = (0, 0) ;
+	foreach (@entries_total_nb) {
+		foreach my $nb ( @{$_} ) { $total_entries += $$nb ; }
+		if ($total_entries > 0) { $nb_pages++ ; }
+		$total_entries = 0 ;
+	}
+
+	$nb_pages_for_html_out = ceil( $nb_pages / $CONF->{HTML_ENTRIES_PER_PAGE} )  ;
+	print "[INFO] write HTML output file containing $nb_pages_for_html_out pages\n" if ($verbose == 3);
+	
 	my $ohtml = lib::writer->new() ;
-	$tbody_object = $ohtml->set_html_tbody_object( $nb_pages_for_html_out, $CONF->{HTML_ENTRIES_PER_PAGE} ) ;
+	$tbody_object = $ohtml->set_html_tbody_object( $nb_pages_for_html_out ) ;
 	$tbody_object = $ohtml->add_mz_to_tbody_object( $tbody_object, $CONF->{HTML_ENTRIES_PER_PAGE}, $init_mzs, $init_rts, \@entries_total_nb) ;
-	$tbody_object = $ohtml->add_transformation_to_tbody_object( $init_mzs, \@transfo_init_mzs, \@transfo_annotations, $tbody_object ) ;
-	$tbody_object = $ohtml->add_cluster_to_tbody_object( $init_mzs, \@transfo_init_mzs, \@clusters_results, $tbody_object ) ;
-	$tbody_object = $ohtml->add_entry_to_tbody_object( $init_mzs, \@transfo_init_mzs, \@clusters_results, \@entries_results, $tbody_object ) ;	
+	$tbody_object = $ohtml->add_transformation_to_tbody_object( \@transfo_init_mzs, \@transfo_annotations, $tbody_object ) ;
+	$tbody_object = $ohtml->add_cluster_to_tbody_object( \@transfo_init_mzs, \@clusters_results, $tbody_object ) ;
+	$tbody_object = $ohtml->add_entry_to_tbody_object( \@transfo_init_mzs, \@clusters_results, \@entries_results, $tbody_object ) ;	
 	my $output_html = $ohtml->write_html_skel(\$output_html_file, $tbody_object, $nb_pages_for_html_out, $CONF->{'HTML_TEMPLATE'}, $CONF->{'JS_GALAXY_PATH'}, $CONF->{'CSS_GALAXY_PATH'}) ;
 }
 
@@ -360,8 +372,9 @@ sub help {
 	# Input : 
 	# Author : Franck GIACOMONI and Marion LANDI
 	# Email : fgiacomoni\@clermont.inra.fr
-	# Version : 1.0
+	# Version : $version
 	# Created : 16/07/2012
+	# Updated: 09/06/2016 - REST implem
 	USAGE :
 	        wsdl_lipidmaps.pl -help
 	        wsdl_lipidmaps.pl 
