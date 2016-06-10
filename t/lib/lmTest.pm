@@ -6,13 +6,16 @@ use strict;      # this prevents silly errors
 use Exporter ;
 use Carp ;
 
+use Data::Dumper ;
+
 our $VERSION = "1.0";
 our @ISA = qw(Exporter);
-our @EXPORT = qw( build_lm_mass_queryTest );
-our %EXPORT_TAGS = ( ALL => [qw( build_lm_mass_queryTest )] );
+our @EXPORT = qw( build_lm_mass_queryTest round_numsTest );
+our %EXPORT_TAGS = ( ALL => [qw( build_lm_mass_queryTest round_numsTest )] );
 
 use lib '/Users/fgiacomoni/Inra/labs/perl/galaxy_tools/lipidmaps' ;
 use lib::lipidmaps qw( :ALL ) ;
+use lib::operations qw( :ALL ) ;
 
 sub build_lm_mass_queryTest {
 	
@@ -35,7 +38,17 @@ sub build_lm_mass_queryTest {
 	return ($complete_url) ;
 }
 
-
+## SUB TEST for 
+sub round_numsTest {
+    # get values
+    my ( $numbers, $decimal ) = @_;
+    
+    my $oround = lib::operations->new() ;
+    my $rounds = $oround->round_nums($numbers, $decimal) ;
+    
+    return($rounds) ;
+}
+## End SUB
 
 
 1 ;

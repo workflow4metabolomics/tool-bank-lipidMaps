@@ -178,10 +178,23 @@ sub round_nums {
     my ( $numbers, $decimal ) = @_ ;
     my @round_nums = () ;
     
-    if ( ( defined $decimal ) and ( $decimal > 0 ) and ( defined $numbers ) and ( scalar(@{$numbers}) > 0 ) ) {
+    print Dumper $numbers ;
+    
+    if ( ( defined $decimal ) and ( $decimal >= 0 ) and ( defined $numbers ) and ( scalar(@{$numbers}) > 0 ) ) {
     	foreach my $nb ( @{$numbers} ) {
-	    	my $round_num = sprintf("%.".$decimal."f", $nb);	## on utilise un arrondit : 5.3 -> 5 et 5.5 -> 6
-	    	push ( @round_nums, $round_num ) ;
+    		if ( ( defined $nb ) ) {
+    			if ($nb =~ /^\d+\.\d+$/  ) { ## check float
+    				my $round_num = sprintf("%.".$decimal."f", $nb);	## on utilise un arrondit : 5.3 -> 5 et 5.5 -> 6 mais 5.25 -> 5.2
+	    			push ( @round_nums, $round_num ) ;
+    			}
+    			else {
+    				warn "This var $nb is not a float\n" ;
+    			}
+    		}
+    		else {
+    			croak "This number is not defined or is a string\n ";
+    		}
+	    	
 	    }
     }
     else {
