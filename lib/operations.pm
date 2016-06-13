@@ -178,7 +178,7 @@ sub round_nums {
     my ( $numbers, $decimal ) = @_ ;
     my @round_nums = () ;
     
-    print Dumper $numbers ;
+#    print Dumper $numbers ;
     
     if ( ( defined $decimal ) and ( $decimal >= 0 ) and ( defined $numbers ) and ( scalar(@{$numbers}) > 0 ) ) {
     	foreach my $nb ( @{$numbers} ) {

@@ -399,9 +399,9 @@ sub add_cluster_to_tbody_object {
     my $index_page = 0 ;
     my $current_mz = 0 ; 
     
-    print Dumper  $transfo_masses;
+#    print Dumper  $transfo_masses;
     
-    print Dumper $clusters_results ;
+#    print Dumper $clusters_results ;
     
     foreach my $page (@{$tbody_object}) {
     	
