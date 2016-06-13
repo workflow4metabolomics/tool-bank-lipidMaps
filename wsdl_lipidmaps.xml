@@ -85,6 +85,7 @@
 				               <param name="filter_subclass" label="Select a Lipid subclass for your query " type="select">
 				                  <option value="NA_100">No subclass available</option>
 				               </param>
+				               <when value="NA_100"></when>
 				            </conditional>
 				         </when>
 				      </conditional>
