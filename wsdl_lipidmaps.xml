@@ -1629,46 +1629,49 @@
 	<tests>
   	<test>
   		<!--test 01 some results - input01_50_without_class.csv -->
-  		<param name="input" value="input01_50_without_class.csv"/>
+  		<param name="file_input" value="input01_50_without_class.csv"/>
   		<param name="lineheader" value="1"/>
-  		<param name="colmass" value="3"/>
-  		<param name="colrt" value="1"/>
-  		<param name="delta" value="0.5"/>
+  		<param name="col_mass" value="3"/>
+  		<param name="col_rt" value="1"/>
+  		<param name="tolerance" value="0.5"/>
   		<param name="decimal" value="2"/>
-  		<param name="round" value="round"/>
-  		<param name="cat" value="3"/>
-  		<param name="class" value="306"/>
-  		<param name="subclass" value="NA_306"/>
-  		<output name="output" file="out_test01.tabular"/>
-  		<output name="view" file="out_test01.html"/>
+  		<param name="round_type" value="round"/>
+  		<param name="complex_query_action" value="no"/>
+  		<param name="filter_cat" value="3"/>
+  		<param name="filter_class" value="306"/>
+  		<param name="filter_subclass" value="NA_306"/>
+  		<output name="variableMetadata" file="out_test01.tabular"/>
+  		<output name="LMSDResView" file="out_test01.html"/>
   	</test>
   	<test>
   		<!--test 02 : some results - input02_480_several_class.csv file-->
-  		<param name="input" value="input02_480_several_class.csv"/>
+  		<param name="file_input" value="input02_480_several_class.csv"/>
   		<param name="lineheader" value="1"/>
-  		<param name="colmass" value="1"/>
-  		<param name="colrt" value="2"/>
-  		<param name="delta" value="0.5"/>
+  		<param name="col_mass" value="1"/>
+  		<param name="col_rt" value="2"/>
+  		<param name="tolerance" value="0.5"/>
   		<param name="decimal" value="2"/>
-  		<param name="round" value="round"/>
-  		<param name="cat" value="3"/>
-  		<param name="class" value="301"/>
-  		<param name="subclass" value="NA_301"/>
-  		<output name="output" file="out_test02.tabular"/>
-  		<output name="view" file="out_test02.html"/>
+  		<param name="round_type" value="round"/>
+  		<param name="complex_query_action" value="no"/>
+  		<param name="filter_cat" value="3"/>
+  		<param name="filter_class" value="301"/>
+  		<param name="filter_subclass" value="NA_301"/>
+  		<output name="variableMetadata" file="out_test02.tabular"/>
+  		<output name="LMSDResView" file="out_test02.html"/>
   	</test>
   	<test>
   		<!--test 03 : some results - input03_200_without_class_on_maincl_301.csv file-->
-  		<param name="input" value="input03_200_without_class_on_maincl_301.csv"/>
+  		<param name="file_input" value="input03_200_without_class_on_maincl_301.csv"/>
   		<param name="lineheader" value="1"/>
-  		<param name="colmass" value="3"/>
-  		<param name="colrt" value="1"/>
-  		<param name="colclassif" value="3"/>
-  		<param name="delta" value="0.5"/>
+  		<param name="col_mass" value="3"/>
+  		<param name="col_rt" value="1"/>
+  		<param name="complex_query_action" value="yes"/>
+  		<param name="col_classif_id" value="3"/>
+  		<param name="tolerance" value="0.5"/>
   		<param name="decimal" value="2"/>
-  		<param name="round" value="round"/>
-  		<output name="output" file="out_test03.tabular"/>
-  		<output name="view" file="out_test03.html"/>
+  		<param name="round_type" value="round"/>
+  		<output name="variableMetadata" file="out_test03.tabular"/>
+  		<output name="LMSDResView" file="out_test03.html"/>
   	</test>
   </tests>
 	  <help>
