@@ -11,6 +11,7 @@ use Data::Dumper ;
 use POSIX ;
 use XML::Twig;
 use Getopt::Long ;
+use Time::HiRes;
 
 
 ## Permet de localisez le repertoire du script perl d'origine
@@ -32,10 +33,12 @@ use lib::operations  qw( :ALL ) ;
 
 ## Initialized values
 #
+my $version = '1.1';
 my ( $help, $input_file, $line_header, $col_mass, $col_rt, $decimal, $round_type, $delta ) = ( undef, undef, undef, undef, undef, undef, undef, undef ) ; 
 my ( $list_oxidation, $list_neutral_loss ) = ( undef, undef, undef ) ; 
 my ( $col_classif_id, $selected_cat, $selected_cl, $selected_subcl ) = ( undef, undef, undef, undef ) ; 
 my ( $output_csv_file, $output_html_file, $output_link_file  ) = ( undef, undef, undef ) ;
+my $verbose = 3; 
 
 # for test ONLY !
 #( $input_file, $line_header, $col_mass, $col_rt, $decimal, $round_type, $delta )  = ('/Users/fgiacomoni/Inra/labs/tests/galaxy/lipidmaps/test_lipidmaps_avec_class_short.csv', 1, 2, 3, 2, 'round', 0.5 ) ;
@@ -112,13 +115,13 @@ my ( $ox_names, $ox_values, $loss_names, $loss_values ) = ( [], [], [], [] ) ;
 my ( $is_header, $tbody_object) = (undef, undef) ;
 
 
-#print "-----------**********MAIN -- DUMP*********-------------\n" ;
+print "-----------**********START of MAIN LIPIDMAPS -- version $version *********-------------\n" if ($verbose == 3);
 
 #### --------------------------------- 01 :: Prepare all and Parsing steps on inputs -------------------------------------
 
 ## Open CVS FILE / Extract and transform Masses  
 if ( ( defined $input_file ) and ( -e $input_file ) ) {
-	
+	print "\n[INFO] Open input file and get values...\n" if ($verbose == 3);
 	## parse all csv for later : output csv build
 	my $ocsv_input  = lib::csv->new() ;
 	my $csv = $ocsv_input->get_csv_object( "\t" ) ;
@@ -129,6 +132,8 @@ if ( ( defined $input_file ) and ( -e $input_file ) ) {
 	
 	## parse masses
 	if ( defined $col_mass ) {
+		print "[INFO] Get masses from input file $input_file ...\n" if ($verbose == 3);
+		print "[INFO] Get RT from input file $input_file ...\n" if ($verbose == 3);
 		my $ocsv = lib::csv->new() ;
 		my $csv = $ocsv->get_csv_object( "\t" ) ;
 		$init_mzs = $ocsv->get_value_from_csv_multi_header( $csv, $input_file, $col_mass, $is_header, $line_header ) ; ## retrieve mz values on csv
@@ -136,6 +141,7 @@ if ( ( defined $input_file ) and ( -e $input_file ) ) {
 	}
 	## round masses
 	if ( ( defined $round_type ) and ( defined $decimal ) ) {
+		print "\t [INFO] Apply mass rounding ...\n" if ($verbose == 3);
 		my $oround = lib::operations::new() ;
 		if 		( $round_type eq 'truncation' ) { 	$round_init_mzs = $oround->truncate_nums( $init_mzs, $decimal ) ; 			}
 		elsif 	( $round_type eq 'round' ) {		$round_init_mzs = $oround->round_nums( $init_mzs, $decimal ) ;  			}
@@ -143,6 +149,7 @@ if ( ( defined $input_file ) and ( -e $input_file ) ) {
 	}
 	## parse classif ids -- optionnal
 	if ( defined $col_classif_id ) {
+		print "\t [INFO] Get LM classification IDS from input file $input_file ...\n" if ($verbose == 3);
 		my $ocsv = lib::csv::new() ;
 		my $csv = $ocsv->get_csv_object( "\t" ) ;
 		$classif_ids = $ocsv->get_value_from_csv( $csv, $input_file, $col_classif_id, $is_header, $line_header ) ;
@@ -150,10 +157,12 @@ if ( ( defined $input_file ) and ( -e $input_file ) ) {
 	
 	## Uses N mz and theirs entries per page (see config file).
 	# how many pages you need with your input mz list?
-	$nb_pages_for_html_out = ceil( scalar(@{$init_mzs} ) / $CONF->{HTML_ENTRIES_PER_PAGE} )  ;
+#	$nb_pages_for_html_out = ceil( scalar(@{$init_mzs} ) / $CONF->{HTML_ENTRIES_PER_PAGE} )  ;
+#	print "[INFO] Your analysis will generate $nb_pages_for_html_out pages of results...\n" if ($verbose == 3);
 	
 }
 else {
+	print "[ERROR] Can't find any input file $input_file\n" if ($verbose == 3);
 	croak "Can't find any input file $input_file\n" ;
 }
 
@@ -207,10 +216,11 @@ foreach my $init_mz (@{$round_init_mzs}) {
 	my ( @queries, @query_results, @query_result_entries, @query_result_entry_nbs, @query_result_clusters ) = ( (), (), (), (), () ) ;
 	
 	foreach my $transfo_mz ( @{$transfo_init_mzs[$init_mz_index]} ) {
+		print "[INFO] Prepare the $i.th query with the mz: $$transfo_mz... \n" if ($verbose == 3);
 		## LM recommandation : If you write a script to automate calls to LMSD, 
 		# please be kind and do not hit our server more often than once per 20 seconds.
 		# We may have to kill scripts that hit our server more frequently.
-		sleep (20) ; 
+		Time::HiRes::sleep(0.1); #.1 seconds 
 		my ( $cat, $cl, $subcl ) = ( undef, undef, undef ) ;
 	#	if ( $i >= ( scalar( @transfos_values )-1 ) ) { $i = 0 ; } ## manage the modif for each masses.
 			
@@ -238,6 +248,7 @@ foreach my $init_mz (@{$round_init_mzs}) {
 		## buid and get http query :
 		my $oquery = lib::lipidmaps::new() ;
 		my $ref_http_query = $oquery->build_lm_mass_query( \$CONF->{'SEARCH_URL'}, \$delta, $cat, $cl, $subcl ) ; ## build the query for LM WS, return a list of http, get method
+		print "\t[INFO] Exec $$ref_http_query \n" if ($verbose == 3);
 		
 		## set entries clusters
 		my ( $http_result_mz, $http_query_mz ) = $oquery->get_lm_mass_query($ref_http_query, $transfo_mz) ; ## execute the query, return a list of non-splited lm_entries.
@@ -245,9 +256,11 @@ foreach my $init_mz (@{$round_init_mzs}) {
 		if ( (defined $http_result_mz) and ( $$http_result_mz ne '' ) ) { # avoid empty LM results
 			( $mz_entries_results, $mz_entries_nb ) = $oquery->get_lm_entry_object($http_result_mz, $transfo_mz) ; ## get all features of each entry and return a list of features keept in a hash
 			$mz_clusters_results = $oquery->get_cluster_object($mz_entries_results, \%RULES, \%RECIPES) ; ## clustering all entries and return a list of clusters keept in a hash
+			print "\t[INFO] The query return $$mz_entries_nb entries\n" if ($verbose == 3);
 		}
 		else { # manage empty LM results
 			( $mz_entries_results, $mz_entries_nb, $mz_clusters_results ) = ( [], \0, [] ) ;
+			print "\t[INFO] The query return none entry with LM\n" if ($verbose == 3);
 		}	
 		
 		push( @queries, $http_query_mz ) ;
@@ -274,12 +287,23 @@ foreach my $init_mz (@{$round_init_mzs}) {
 
 # prepare data and write html output :
 if ( defined $output_html_file) {
+	## Adjust html output with only mz with records
+	my ($nb_pages, $total_entries) = (0, 0) ;
+	foreach (@entries_total_nb) {
+		foreach my $nb ( @{$_} ) { $total_entries += $$nb ; }
+		if ($total_entries > 0) { $nb_pages++ ; }
+		$total_entries = 0 ;
+	}
+
+	$nb_pages_for_html_out = ceil( $nb_pages / $CONF->{HTML_ENTRIES_PER_PAGE} )  ;
+	print "[INFO] write HTML output file containing $nb_pages_for_html_out pages\n" if ($verbose == 3);
+	
 	my $ohtml = lib::writer->new() ;
-	$tbody_object = $ohtml->set_html_tbody_object( $nb_pages_for_html_out, $CONF->{HTML_ENTRIES_PER_PAGE} ) ;
+	$tbody_object = $ohtml->set_html_tbody_object( $nb_pages_for_html_out ) ;
 	$tbody_object = $ohtml->add_mz_to_tbody_object( $tbody_object, $CONF->{HTML_ENTRIES_PER_PAGE}, $init_mzs, $init_rts, \@entries_total_nb) ;
-	$tbody_object = $ohtml->add_transformation_to_tbody_object( $init_mzs, \@transfo_init_mzs, \@transfo_annotations, $tbody_object ) ;
-	$tbody_object = $ohtml->add_cluster_to_tbody_object( $init_mzs, \@transfo_init_mzs, \@clusters_results, $tbody_object ) ;
-	$tbody_object = $ohtml->add_entry_to_tbody_object( $init_mzs, \@transfo_init_mzs, \@clusters_results, \@entries_results, $tbody_object ) ;	
+	$tbody_object = $ohtml->add_transformation_to_tbody_object( \@transfo_init_mzs, \@transfo_annotations, $tbody_object ) ;
+	$tbody_object = $ohtml->add_cluster_to_tbody_object( \@transfo_init_mzs, \@clusters_results, $tbody_object ) ;
+	$tbody_object = $ohtml->add_entry_to_tbody_object( \@transfo_init_mzs, \@clusters_results, \@entries_results, $tbody_object ) ;	
 	my $output_html = $ohtml->write_html_skel(\$output_html_file, $tbody_object, $nb_pages_for_html_out, $CONF->{'HTML_TEMPLATE'}, $CONF->{'JS_GALAXY_PATH'}, $CONF->{'CSS_GALAXY_PATH'}) ;
 }
 
@@ -290,10 +314,12 @@ my $ocsv = lib::writer->new() ;
 if ( defined $is_header ) { $lm_matrix = $ocsv->set_lm_matrix_object('lipidmaps', $init_mzs, \@transfo_annotations, \@clusters_results ) ;	}
 else { $lm_matrix = $ocsv->set_lm_matrix_object( undef, $init_mzs, \@transfo_annotations, \@clusters_results ) ;	}
 
+
 $lm_matrix = $ocsv->add_lm_matrix_to_input_matrix($init_csv_rows, $lm_matrix) ;
 $ocsv->write_csv_skel(\$output_csv_file, $lm_matrix) ;
+print "[INFO] write CSV output file\n" if ($verbose == 3);
 
-
+print "-----------**********END of MAIN LIPIDMAPS -- version $version *********-------------\n" if ($verbose == 3);
 
 #print "-----------**********RETURNS*********-------------\n" ;
 #print "\n----- Init Input Data in CSV -----\n" ;
@@ -346,8 +372,9 @@ sub help {
 	# Input : 
 	# Author : Franck GIACOMONI and Marion LANDI
 	# Email : fgiacomoni\@clermont.inra.fr
-	# Version : 1.0
+	# Version : $version
 	# Created : 16/07/2012
+	# Updated: 09/06/2016 - REST implem
 	USAGE :
 	        wsdl_lipidmaps.pl -help
 	        wsdl_lipidmaps.pl 

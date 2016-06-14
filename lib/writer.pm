@@ -231,7 +231,7 @@ sub write_html_skel {
 ## START of SUB
 sub set_html_tbody_object {
 	my $self = shift ;
-    my ( $nb_pages, $nb_items_per_page ) = @_ ;
+    my ( $nb_pages ) = @_ ;
 
 	my ( @tbody_object ) = ( ) ;
 	
@@ -261,7 +261,6 @@ sub add_mz_to_tbody_object {
 	## Retrieve Values
     my $self = shift ;
     my ( $tbody_object, $nb_items_per_page, $init_masses, $rts, $nb_total_results ) = @_ ;
-
 	my @colors = ('white', 'green') ;
 	my ( $current_page, $mz_index, $icolor, $total_entries ) = ( 0, 0, 0, 0 ) ;
 	
@@ -277,33 +276,42 @@ sub add_mz_to_tbody_object {
 				last ; ##
 			}
 			else {
-				$current_index++ ;
-				if ( $icolor > 1 ) { $icolor = 0 ; }
+				
 				if ( exists $init_masses->[$mz_index]  ) {
-					
+
 					## calcul total entries
 					my @total = @{$nb_total_results->[$mz_index]} ;
 					foreach my $nb ( @total ) { $total_entries += $$nb ; }
 					
-					my %mz = (
-						# mass feature
-						MASS => $init_masses->[$mz_index], RT => $rts->[$mz_index], TOTAL => $total_entries,
-						# html attr for mass
-						COLOR => ($colors[$icolor]), NB_MASS => $mz_index+1, NB_CLUSTER_BY_MASS => 0, NB_ENTRY_BY_MASS => 0,
-						# cluster group
-						TRANSFORMS => [], ## end TRANSFOS
-					) ; ## end mass N
-					
-					## Html attr for mass
-					$icolor++ ;
+					if ($total_entries > 0) {
+						$current_index++ ;
+						if ( $icolor > 1 ) { $icolor = 0 ; }
+						
+						my %mz = (
+							# mass feature
+							MASS => $init_masses->[$mz_index], RT => $rts->[$mz_index], TOTAL => $total_entries,
+							# html attr for mass
+							COLOR => ($colors[$icolor]), NB_MASS => $mz_index+1, NB_CLUSTER_BY_MASS => 0, NB_ENTRY_BY_MASS => 0,
+							# cluster group
+							TRANSFORMS => [], ## end TRANSFOS
+						) ; ## end mass N
+						
+						## Html attr for mass
+						$icolor++ ;
+						push ( @{ $tbody_object->[$current_page]{MASSES} }, \%mz ) ;
+					}
+					else {
+						## Can't fill the object
+						$i-- ;
+					}
 					$mz_index++ ;
 					$total_entries = 0 ;
-					push ( @{ $tbody_object->[$current_page]{MASSES} }, \%mz ) ;
 				}
 			}
 		}
 		$current_page++ ;
-	}  
+	}
+
     return($tbody_object) ;
 }
 ## END of SUB
@@ -320,21 +328,29 @@ sub add_mz_to_tbody_object {
 sub add_transformation_to_tbody_object {
 	## Retrieve Values
     my $self = shift ;
-    my ( $init_masses, $transfo_masses, $transfo_annot, $tbody_object ) = @_ ;
+    my ( $transfo_masses, $transfo_annot, $tbody_object ) = @_ ;
     
     my $index_page = 0 ;
     
     foreach my $page (@{$tbody_object}) {
     	
     	my $index_mz = 0 ;
-    	
-		foreach my $init_mz ( @{ $tbody_object->[$index_page]{MASSES} }) {
-	    	
+    		
+		foreach my $init_filtered_mz ( @{ $tbody_object->[$index_page]{MASSES} }) {
+
 	    	my $index_transfo = 0 ;
+	    	my $index_filtered_mz = undef ;
 	    	
-	    	foreach my $transfo ( @{$transfo_masses->[$index_mz]} ) {
+	    	if ($init_filtered_mz->{NB_MASS} ) {
+	    		$index_filtered_mz = $init_filtered_mz->{NB_MASS}-1 ;
+	    	}
+	    	else{
+	    		last;
+	    	}
+	    	
+	    	foreach my $transfo ( @{$transfo_masses->[$index_filtered_mz]} ) {
 	    		
-	    		my $transfo_type = $transfo_annot->[$index_mz][$index_transfo] ;
+	    		my $transfo_type = $transfo_annot->[$index_filtered_mz][$index_transfo] ;
 	    		my $color = undef ;
 	    		# manage Bolt color : 
 	    		if ($tbody_object->[$index_page]{MASSES}[$index_mz]{COLOR} eq 'white') {
@@ -356,11 +372,11 @@ sub add_transformation_to_tbody_object {
 				push(@{$tbody_object->[$index_page]{MASSES}[$index_mz]{TRANSFORMS}}, \%transformation ) ;
 	        	$index_transfo++ ;
 	    	}
-	        $index_mz++ ;
+	    	$index_mz ++ ;
 	    }
     	$index_page++ ;
     }
-        
+
     return($tbody_object) ;
 }
 ## END of SUB
@@ -377,25 +393,38 @@ sub add_transformation_to_tbody_object {
 sub add_cluster_to_tbody_object {
 	## Retrieve Values
     my $self = shift ;
-    my ( $init_masses, $transfo_masses, $clusters_results, $tbody_object ) = @_ ;
+    my ( $transfo_masses, $clusters_results, $tbody_object ) = @_ ;
     my @cluster_objects = () ;
     
     my $index_page = 0 ;
-    my $current_mz = 0 ;  
+    my $current_mz = 0 ; 
+    
+#    print Dumper  $transfo_masses;
+    
+#    print Dumper $clusters_results ;
     
     foreach my $page (@{$tbody_object}) {
     	
     	my $index_mz = 0 ;
 
-		foreach my $mz  ( @{ $tbody_object->[$index_page]{MASSES} }) {
+		foreach my $filtered_mz  ( @{ $tbody_object->[$index_page]{MASSES} }) {
+			
+			my $index_filtered_mz = undef ;
+	    	
+	    	if ($filtered_mz->{NB_MASS} ) {
+	    		$index_filtered_mz = $filtered_mz->{NB_MASS}-1 ;
+	    	}
+	    	else{
+	    		last;
+	    	}
 			
 			my $index_transfo = 0 ;
 			
-			foreach my $transfo ( @{$transfo_masses->[$current_mz]} ) {
+			foreach my $transfo ( @{$transfo_masses->[$index_filtered_mz]} ) {
 				
 				my $index_cluster = 0 ;
 				
-				foreach my $cluster (@{$clusters_results->[$current_mz][$index_transfo]}) {
+				foreach my $cluster (@{$clusters_results->[$index_filtered_mz][$index_transfo]}) {
 					
 					my $cluster_formula = $cluster->{FORMULA} ;
 		    		my $cluster_name = $cluster->{CLUSTER_NAME} ;
@@ -427,6 +456,7 @@ sub add_cluster_to_tbody_object {
 		}
 		$index_page++ ;
     }
+
     return($tbody_object) ;
 }
 ## END of SUB
@@ -443,7 +473,7 @@ sub add_cluster_to_tbody_object {
 sub add_entry_to_tbody_object {
 	## Retrieve Values
     my $self = shift ;
-    my ( $init_masses, $transfo_masses, $clusters_results, $entries_results, $tbody_object ) = @_ ;
+    my ( $transfo_masses, $clusters_results, $entries_results, $tbody_object ) = @_ ;
     
     my $index_page = 0 ;
     my $current_mz = 0 ; 
@@ -452,19 +482,28 @@ sub add_entry_to_tbody_object {
     	
     	my $index_mz = 0 ;
 
-		foreach my $mz  ( @{ $tbody_object->[$index_page]{MASSES} }) {
+		foreach my $filtered_mz  ( @{ $tbody_object->[$index_page]{MASSES} }) {
+			
+			my $index_filtered_mz = undef ;
+	    	
+	    	if ($filtered_mz->{NB_MASS} ) {
+	    		$index_filtered_mz = $filtered_mz->{NB_MASS}-1 ;
+	    	}
+	    	else{
+	    		last;
+	    	}
     	
-		my $index_transfo = 0 ;
+			my $index_transfo = 0 ;
 		
-	    	foreach (@{$transfo_masses->[$current_mz]}) {
+	    	foreach (@{$transfo_masses->[$index_filtered_mz]}) {
 	    		my $index_cluster = 0 ;
 	    		
-	    		foreach my $cluster (@{$clusters_results->[$current_mz][$index_transfo]}) {
+	    		foreach my $cluster (@{$clusters_results->[$index_filtered_mz][$index_transfo]}) {
 	    			my $index_entry = 0 ;
 	    			
 	    			foreach my $entry_name (@{$cluster->{'ENTRY_IDS'}}) { ## the part to fill
 	    				
-	    				foreach my $entry (@{$entries_results->[$current_mz][$index_transfo]}) { ## reference entries
+	    				foreach my $entry (@{$entries_results->[$index_filtered_mz][$index_transfo]}) { ## reference entries
 	    					my $q_entry = $entry->{ID} ;
 	    					
 	    					## compare and matche only same entries
@@ -501,6 +540,7 @@ sub add_entry_to_tbody_object {
     	} ## end foreach MZ
     	$index_page++
     } ## end foreach PAGE
+
     return($tbody_object) ;
 }
 ## END of SUB
