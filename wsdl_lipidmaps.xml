@@ -1620,7 +1620,7 @@
 			<option value="round">round</option>
 			<option value="truncation">truncation</option>
 		</param>
-		<param name="tolerance" label="Delta of mass " type="float" value="0.5" size="10" help="Exact mass off set (great as +/- 0.01 to +/- 100)." />
+		<param name="tolerance" label="Mass-to-charge ratio " type="float" min="0" max="100" value="0.5" size="10" help="Default value is 0.5 for LM (mass-to-charge ratio)" />
 	</inputs>
 	<outputs>
 		<data name="variableMetadata" format="tabular"  label="${tool.name}_TSV"/>
