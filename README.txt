@@ -1,5 +1,5 @@
 ## ****** Lipidmaps environnemnt : ****** ##
-# version 2014.07.17 M Landi / F Giacomoni
+# version 2016.09.27 M Landi / F Giacomoni - INRA - METABOHUB - workflow4metabolomics.org core team
 
 ## --- PERL compilator / libraries : --- ##
 $ perl -v
@@ -18,15 +18,23 @@ use Getopt::Long ;
 use FindBin;
 
 # libs CPAN PERL : 
-use LWP::Simple ;
+use LWP::UserAgent ;
+use Text::CSV ;
 use HTML::Template ;
 use XML::Twig;
+use Time::HiRes;
+
+$ sudo perl -MCPAN -e shell
+cpan> install Text::CSV
 
 # libs pfem PERL : libs are now integrated
 use lib::conf  qw( :ALL ) ;
 use lib::csv  qw( :ALL ) ;
 use lib::operations  qw( :ALL ) ;
 --
+
+## --- Conda compliant --- ##
+This tool and its PERL dependencies are "Conda compliant".
 
 ## --- R bin and Packages : --- ##
 NA
@@ -37,9 +45,7 @@ NA - use only lipidmaps ws (http://www.lipidmaps.org/data/structure/LMSDSearch.p
 --
 
 ## --- Config : --- ##
-Edit the following lines in the config file : lipidmaps.conf
-JS_GALAXY_PATH=http://YOUR_GALAXY_HOSTNAME/static/scripts/libs/outputs
-CSS_GALAXY_PATH=http://YOUR_GALAXY_HOSTNAME/static/style
+JS and CSS (used in HTML output format) are now hosted on cdn.rawgit.com server - no local config needed
 --
 
 ## --- XML HELP PART --- ##
@@ -47,15 +53,12 @@ one image :
 lipidmaps.png
 --
 
-## --- DATASETS --- ##
-No data set ! waiting for galaxy pages
+## --- DATASETS OR TUTORIAL --- ##
+Please find help on W4M: http://workflow4metabolomics.org/howto 
 --
 
 ## --- ??? COMMENTS ??? --- ##
 The Lipidmaps WS ask to sleep 20s between each query... 
 To use full funtionalities of html output files : 
   - check that sanitize_all_html option in universe_wsgi.ini file is uncomment and set to FALSE.
-  - copy the following JS files in YOUR_GALAXY_PATH/static/scripts/libs/outputs/ : jquery.simplePagination.js, main.js, shBrushJScript.js, shCore.js
-  - copy the following CSS files in YOUR_GALAXY_PATH/static/style/ : simplePagination.css
- Their files (pfem-js and pfem-css) are available in the ABIMS toolshed "Tool Dependency Packages" category.
 --
