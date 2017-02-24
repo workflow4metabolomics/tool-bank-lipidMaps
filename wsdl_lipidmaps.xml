@@ -31,7 +31,7 @@
 			-listneutralloss ${data_type.neutral_loss} -listoxidation ${data_type.oxidation}
 		#end if
 		
-		-output $variableMetadata_out -view $LMSDResView
+		-output $variableMetadata_out -view $LMSDOutWeb
 		
 	]]></command>
 	<inputs>
