@@ -122,6 +122,8 @@ sub set_lm_matrix_object {
 	    			
 	    			## METLIN data display model 
 	    			## entry1=VAR1::VAR2::VAR3::VAR4|entry2=VAR1::VAR2::VAR3::VAR4|...
+	    			## Format : -0.18::(PI_22:0)::(C31H61O12P)::LMGP06050024
+	    			##(score::name::mz::formula::adduct::id)
 	    			push (@clusters_tmp, $$delta.'::('.$$name.')'.$transfo.'::('.$$formula.')'.$transfo.'::'.$$lm_id_ex) ;    			
 	    			$index_cluster++ ;
 	    		}  ## end FOR cluster
@@ -251,7 +253,7 @@ sub set_html_tbody_object {
 =head2 METHOD add_mz_to_tbody_object
 
 	## Description : initializes and build the mass object (perl array) need to html template
-	## Input : $init_masses, $rts, $nb_results
+	## Input : $init_masses, $nb_results
 	## Output : $mz_objects
 	## Usage : my ( $mz_object ) = add_mz_to_tbody_object($init_masses, $rts, $nb_results) ;
 	
@@ -260,7 +262,7 @@ sub set_html_tbody_object {
 sub add_mz_to_tbody_object {
 	## Retrieve Values
     my $self = shift ;
-    my ( $tbody_object, $nb_items_per_page, $init_masses, $rts, $nb_total_results ) = @_ ;
+    my ( $tbody_object, $nb_items_per_page, $init_masses, $nb_total_results ) = @_ ;
 	my @colors = ('white', 'green') ;
 	my ( $current_page, $mz_index, $icolor, $total_entries ) = ( 0, 0, 0, 0 ) ;
 	
@@ -289,7 +291,8 @@ sub add_mz_to_tbody_object {
 						
 						my %mz = (
 							# mass feature
-							MASS => $init_masses->[$mz_index], RT => $rts->[$mz_index], TOTAL => $total_entries,
+#							MASS => $init_masses->[$mz_index], RT => $rts->[$mz_index], TOTAL => $total_entries,
+							MASS => $init_masses->[$mz_index], TOTAL => $total_entries,
 							# html attr for mass
 							COLOR => ($colors[$icolor]), NB_MASS => $mz_index+1, NB_CLUSTER_BY_MASS => 0, NB_ENTRY_BY_MASS => 0,
 							# cluster group
@@ -442,7 +445,7 @@ sub add_cluster_to_tbody_object {
 						CLUSTER_FORMULA => $$cluster_formula,
 						CLUSTER_NAME => $$cluster_name, 
 						CLUSTER_DELTA => $$cluster_delta, 
-						CLUSTER_RATIO => $cluster->{ISOTOPIC_RATIO},
+#						CLUSTER_RATIO => $cluster->{ISOTOPIC_RATIO},
 					# entries group
 						ENTRIES => [], ## end ENTRIES
 					) ; ## end cluster 01
