@@ -327,7 +327,10 @@ if ( defined $output_html_file) {
 	$tbody_object = $ohtml->add_mz_to_tbody_object( $tbody_object, $CONF->{HTML_ENTRIES_PER_PAGE}, $init_mzs, \@entries_total_nb) ;
 	$tbody_object = $ohtml->add_transformation_to_tbody_object( \@transfo_init_mzs, \@transfo_annotations, $tbody_object ) ;
 	$tbody_object = $ohtml->add_cluster_to_tbody_object( \@transfo_init_mzs, \@clusters_results, $tbody_object ) ;
-	$tbody_object = $ohtml->add_entry_to_tbody_object( \@transfo_init_mzs, \@clusters_results, \@entries_results, $tbody_object ) ;	
+	$tbody_object = $ohtml->add_entry_to_tbody_object( \@transfo_init_mzs, \@clusters_results, \@entries_results, $tbody_object ) ;
+	
+	$tbody_object = $ohtml->sort_tbody_object($tbody_object) ;
+	
 	my $output_html = $ohtml->write_html_skel(\$output_html_file, $tbody_object, $nb_pages_for_html_out, $CONF->{'HTML_TEMPLATE'}, $CONF->{'JS_GALAXY_PATH'}, $CONF->{'CSS_GALAXY_PATH'}) ;
 }
 
