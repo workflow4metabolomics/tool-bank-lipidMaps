@@ -139,6 +139,27 @@ if ( ( defined $input_file ) and ( -e $input_file ) ) {
 		$init_mzs = $ocsv->get_value_from_csv_multi_header( $csv, $input_file, $col_mass, $is_header, $line_header ) ; ## retrieve mz values on csv
 		$init_rts = $ocsv->get_value_from_csv_multi_header( $csv, $input_file, $col_rt, $is_header, $line_header ) ; ## retrieve rt values on csv
 	}
+	
+	## Adjust the mz to the instrument mode (POS/NEG)
+	if ( ( defined $mode ) and ( ($mode eq 'POS') or ($mode eq 'NEG') ) ) {
+		print "\t [INFO] Apply mass mode transforming (POS to NEU or NEG to NEU) ...\n" if ($verbose == 3);
+		my @mode_init_mzs = () ;
+		my $omode = lib::operations::new() ;
+		foreach my $mz (@$init_mzs) {
+			push (@mode_init_mzs, ${$omode->manage_mode(\$mode, \1, \0.0005486, \1.007825, \$mz)} ) ;
+		}
+		
+		if ( (scalar @$init_mzs) == (scalar @mode_init_mzs) ) {
+			$init_mzs = \@mode_init_mzs ;
+		}
+		else {
+			carp "[ERROR] The mode managing process failed and init mzs have been corrompted\n"
+		}
+	}
+	else {
+		print "\t [INFO] Apply no mass mode transforming\n" if ($verbose == 3);
+	}
+	
 	## round masses
 	if ( ( defined $round_type ) and ( defined $decimal ) ) {
 		print "\t [INFO] Apply mass rounding ...\n" if ($verbose == 3);
