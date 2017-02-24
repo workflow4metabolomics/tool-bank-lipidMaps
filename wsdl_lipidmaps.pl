@@ -133,11 +133,11 @@ if ( ( defined $input_file ) and ( -e $input_file ) ) {
 	## parse masses
 	if ( defined $col_mass ) {
 		print "[INFO] Get masses from input file $input_file ...\n" if ($verbose == 3);
-		print "[INFO] Get RT from input file $input_file ...\n" if ($verbose == 3);
+#		print "[INFO] Get RT from input file $input_file ...\n" if ($verbose == 3);
 		my $ocsv = lib::csv->new() ;
 		my $csv = $ocsv->get_csv_object( "\t" ) ;
 		$init_mzs = $ocsv->get_value_from_csv_multi_header( $csv, $input_file, $col_mass, $is_header, $line_header ) ; ## retrieve mz values on csv
-		$init_rts = $ocsv->get_value_from_csv_multi_header( $csv, $input_file, $col_rt, $is_header, $line_header ) ; ## retrieve rt values on csv
+#		$init_rts = $ocsv->get_value_from_csv_multi_header( $csv, $input_file, $col_rt, $is_header, $line_header ) ; ## retrieve rt values on csv
 	}
 	
 	## Adjust the mz to the instrument mode (POS/NEG)
@@ -175,6 +175,8 @@ if ( ( defined $input_file ) and ( -e $input_file ) ) {
 		my $csv = $ocsv->get_csv_object( "\t" ) ;
 		$classif_ids = $ocsv->get_value_from_csv( $csv, $input_file, $col_classif_id, $is_header, $line_header ) ;
 	}
+	
+	
 	
 	## Uses N mz and theirs entries per page (see config file).
 	# how many pages you need with your input mz list?
@@ -321,7 +323,7 @@ if ( defined $output_html_file) {
 	
 	my $ohtml = lib::writer->new() ;
 	$tbody_object = $ohtml->set_html_tbody_object( $nb_pages_for_html_out ) ;
-	$tbody_object = $ohtml->add_mz_to_tbody_object( $tbody_object, $CONF->{HTML_ENTRIES_PER_PAGE}, $init_mzs, $init_rts, \@entries_total_nb) ;
+	$tbody_object = $ohtml->add_mz_to_tbody_object( $tbody_object, $CONF->{HTML_ENTRIES_PER_PAGE}, $init_mzs, \@entries_total_nb) ;
 	$tbody_object = $ohtml->add_transformation_to_tbody_object( \@transfo_init_mzs, \@transfo_annotations, $tbody_object ) ;
 	$tbody_object = $ohtml->add_cluster_to_tbody_object( \@transfo_init_mzs, \@clusters_results, $tbody_object ) ;
 	$tbody_object = $ohtml->add_entry_to_tbody_object( \@transfo_init_mzs, \@clusters_results, \@entries_results, $tbody_object ) ;	
@@ -332,7 +334,7 @@ if ( defined $output_html_file) {
 #write csv ouput : add 'lipidmaps' column to input file
 my $lm_matrix = undef ;
 my $ocsv = lib::writer->new() ;
-if ( defined $is_header ) { $lm_matrix = $ocsv->set_lm_matrix_object('lipidmaps', $init_mzs, \@transfo_annotations, \@clusters_results ) ;	}
+if ( defined $is_header ) { $lm_matrix = $ocsv->set_lm_matrix_object('LIPIDMAPS()', $init_mzs, \@transfo_annotations, \@clusters_results ) ;	}
 else { $lm_matrix = $ocsv->set_lm_matrix_object( undef, $init_mzs, \@transfo_annotations, \@clusters_results ) ;	}
 
 
