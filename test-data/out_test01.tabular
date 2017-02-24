@@ -1,4 +1,4 @@
-ions	"NeutralMass -Na"	"NeutralMass -NH4 "	"NeutralMass -H"	mz	rt	mzmin	mzmax	rtsec	rtmin	rtmax	npeaks	pr172	isotopes	adduct	pcgroup	LIPIDMAPS()
+ions	"NeutralMass -Na"	"NeutralMass -NH4 "	"NeutralMass -H"	mz	rt	mzmin	mzmax	rtsec	rtmin	rtmax	npeaks	pr172	isotopes	adduct	pcgroup	LIPIDMAPS(score::name::mz::formula::adduct::id)
 p579.5421T0.1	565.5390	552.5210	578.5342	579.5421	0.1	579.5421	579.5421	7.5721	7.5721	7.5721	2	2			412	"No_result_found_on LMDS"
 p666.6033T0.1	652.6002	639.5822	665.5955	666.6033	0.1	666.6033	666.6033	4.9551	4.9551	4.9551	2	2			412	"No_result_found_on LMDS"
 p680.4732T0.1	666.4701	653.4521	679.4654	680.4732	0.1	680.4732	680.4732	7.5721	7.5721	7.5721	2	2			412	"No_result_found_on LMDS"
