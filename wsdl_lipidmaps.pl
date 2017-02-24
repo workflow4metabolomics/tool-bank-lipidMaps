@@ -335,7 +335,7 @@ if ( defined $output_html_file) {
 #write csv ouput : add 'lipidmaps' column to input file
 my $lm_matrix = undef ;
 my $ocsv = lib::writer->new() ;
-if ( defined $is_header ) { $lm_matrix = $ocsv->set_lm_matrix_object('LIPIDMAPS()', $init_mzs, \@transfo_annotations, \@clusters_results ) ;	}
+if ( defined $is_header ) { $lm_matrix = $ocsv->set_lm_matrix_object('LIPIDMAPS(score::name::mz::formula::adduct::id)', $init_mzs, \@transfo_annotations, \@clusters_results ) ;	}
 else { $lm_matrix = $ocsv->set_lm_matrix_object( undef, $init_mzs, \@transfo_annotations, \@clusters_results ) ;	}
 
 
