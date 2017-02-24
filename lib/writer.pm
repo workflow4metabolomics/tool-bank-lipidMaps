@@ -124,7 +124,8 @@ sub set_lm_matrix_object {
 	    			## entry1=VAR1::VAR2::VAR3::VAR4|entry2=VAR1::VAR2::VAR3::VAR4|...
 	    			## Format : -0.18::(PI_22:0)::(C31H61O12P)::LMGP06050024
 	    			##(score::name::mz::formula::adduct::id)
-	    			push (@clusters_tmp, $$delta.'::('.$$name.')'.$transfo.'::('.$$formula.')'.$transfo.'::'.$$lm_id_ex) ;    			
+	    			push (@clusters_tmp, $$delta.'::('.$$name.')'.$transfo.'::('.$$formula.')'.$transfo.'::'.$$lm_id_ex) ;
+	    			  			
 	    			$index_cluster++ ;
 	    		}  ## end FOR cluster
     		} ## end IF    		
@@ -133,7 +134,11 @@ sub set_lm_matrix_object {
     	
     	my $nb_total_cluster = scalar(@clusters_tmp) ;
     	my $index_pipe = 0 ;
-    	foreach (@clusters_tmp) {
+    	
+    	## Sort the cluster by score (start of the string)
+    	my @sorted_clusters_tmp = sort { lc($a) cmp lc($b) } @clusters_tmp ;
+    	
+    	foreach (@sorted_clusters_tmp) {
     		if ($index_pipe < $nb_total_cluster-1 ) { $cluster_col .= $_.'|' ; }
     		else { $cluster_col .= $_ ; }
     		$index_pipe++ ;
@@ -463,6 +468,60 @@ sub add_cluster_to_tbody_object {
     return($tbody_object) ;
 }
 ## END of SUB
+
+
+#				
+
+
+=head2 METHOD sort_tbody_object
+
+	## Description : sort cluster and entries by delta
+	## Input : $tbody_object
+	## Output : $tbody_object
+	## Usage : my ( $tbody_object ) = sort_tbody_object ( $tbody_object ) ;
+	
+=cut
+## START of SUB
+sub sort_tbody_object {
+    ## Retrieve Values
+    my $self = shift ;
+    my ( $tbody_object ) = @_;
+    
+    my $index_page = 0 ;
+    
+    ## foreach page
+    foreach my $page (@{$tbody_object}) {
+    	
+    	my $index_mass = 0 ;
+    	foreach my $masses_page ( @{ $page->{'MASSES'} } ) {
+    		
+    		my $index_transfo = 0 ;
+    		foreach my $transforms_mass ( @{ $masses_page->{'TRANSFORMS'} } ) {
+    			
+    			if ($transforms_mass->{'CLUSTERS'}) {
+	    				## sorted by score
+	    			my @sorted = () ;
+	    			my @temp = @{ $transforms_mass->{'CLUSTERS'} } ;
+	    			if (scalar (@temp) > 1 ) { ## for mz without record (only one entry with NA or 0 values)
+			    		@sorted = sort {  abs($a->{CLUSTER_DELTA}) <=> abs($b->{CLUSTER_DELTA}) } @temp ;
+			    	}
+			    	else {
+			    		@sorted = @temp ;
+			    	}
+			    	$tbody_object->[$index_page]{'MASSES'}[$index_mass]{'TRANSFORMS'}[$index_transfo]{'CLUSTERS'} = \@sorted ;
+    			}
+
+    			$index_transfo++ ;
+    		} ## end foreach transforms_mass
+    		$index_mass++ ;
+    	} ## end foreach masses_page
+    	$index_page++ ;
+    }  ## end foreach page
+    
+    return ($tbody_object) ;
+}
+### END of SUB
+
 
 =head2 METHOD add_entry_to_mz_object
 
