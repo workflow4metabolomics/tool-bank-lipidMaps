@@ -34,11 +34,11 @@ use lib::operations  qw( :ALL ) ;
 ## Initialized values
 #
 my $version = '1.1';
-my ( $help, $input_file, $line_header, $col_mass, $col_rt, $decimal, $round_type, $delta ) = ( undef, undef, undef, undef, undef, undef, undef, undef ) ; 
+my ( $help, $input_file, $line_header, $col_mass, $col_rt, $decimal, $round_type, $delta, $mode ) = ( undef, undef, undef, undef, undef, undef, undef, undef, undef ) ; 
 my ( $list_oxidation, $list_neutral_loss ) = ( undef, undef, undef ) ; 
 my ( $col_classif_id, $selected_cat, $selected_cl, $selected_subcl ) = ( undef, undef, undef, undef ) ; 
 my ( $output_csv_file, $output_html_file, $output_link_file  ) = ( undef, undef, undef ) ;
-my $verbose = 3; 
+my $verbose = 1; 
 
 # for test ONLY !
 #( $input_file, $line_header, $col_mass, $col_rt, $decimal, $round_type, $delta )  = ('/Users/fgiacomoni/Inra/labs/tests/galaxy/lipidmaps/test_lipidmaps_avec_class_short.csv', 1, 2, 3, 2, 'round', 0.5 ) ;
@@ -54,18 +54,19 @@ my $verbose = 3;
 				"input|i:s"			=> \$input_file,		# path for input file (CSV format) -- Mandatory
 				"lineheader:i"		=> \$line_header, 		## header presence in tabular file
 				"colmass:i"			=> \$col_mass,			# Input file Column containing Masses for query -- Mandatory
-				"colrt:i"			=> \$col_rt,			# Input file Column containing Retention time
+#				"colrt:i"			=> \$col_rt,			# Input file Column containing Retention time
 				"decimal:i"			=> \$decimal	,		# Significante decimal on mass -- Mandatory
 				"listoxidation:s"	=> \$list_oxidation,	## option : liste des atomes a gerer sur les masses experimentales
 				"listneutralloss:s"	=> \$list_neutral_loss,	## option : liste des atomes a gerer sur les masses experimentales
 				"round:s" 			=> \$round_type,		# Type of truncation -- Mandatory
 				"delta:f" 			=> \$delta,				# delta of mass -- Mandatory
-				"cat:i" 			=> \$selected_cat,		# Number corresponding to the main category in LIPIDMAPS -- Optional
-				"class:i"			=> \$selected_cl,		# Number corresponding to the main classe in LIPIDMAPS -- Optional
-				"subclass:i"		=> \$selected_subcl,	# Number corresponding to the sub class in LIPIDMAPS -- Optional
+				"cat:s" 			=> \$selected_cat,		# Number corresponding to the main category in LIPIDMAPS -- Optional
+				"class:s"			=> \$selected_cl,		# Number corresponding to the main classe in LIPIDMAPS -- Optional
+				"subclass:s"		=> \$selected_subcl,	# Number corresponding to the sub class in LIPIDMAPS -- Optional
 				"output:s"			=> \$output_csv_file,	# File+Path for the results (CVS) -- Mandatory
 				"view:s"			=> \$output_html_file,	# File+Path for the view results (HTML) -- Mandatory
 				"colclassif:i"		=> \$col_classif_id,	# Input file Column containing LM classes ID for query -- Optional
+				"mode:s"			=> \$mode,				# mode of the initial data
             ) ;
 
 #=============================================================================
