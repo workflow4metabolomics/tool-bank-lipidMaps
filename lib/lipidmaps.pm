@@ -134,11 +134,16 @@ sub get_lm_entry_object {
     my ( $result, $q_mass ) = @_ ;
     
     my @entry_objects = () ;
+    my @sorted = () ;
     my $nb_entries = 0 ;
     my $qmass = $$q_mass ;
     
     if ( defined $result ) {
-    	my @entries = split (/\n|\r/, $$result) ;
+    	
+#    	print "RESULTS: $$result\n" ;
+    	
+    	my @tmp = split (/\n|\r/, $$result) ;
+    	my @entries = sort { $a cmp $b } @tmp;
     	$nb_entries = scalar(@entries) ;
     	foreach my $entry (@entries) {
 	    	my %entry = ( ID => undef, COMMON_NAME => undef, SYST_NAME => undef, FORMULA => undef, MASS => undef ) ;
@@ -158,7 +163,16 @@ sub get_lm_entry_object {
     else {
     	croak "Can't manage a an empty result and produce a entry object\n" ;
     }
-    return(\@entry_objects, \$nb_entries) ;
+#    print Dumper @entry_objects ;
+    ## Sort By ID
+    if (scalar (@entry_objects) > 1 ) { ## for 
+    	@sorted = sort {  $a->{ID} cmp $b->{ID} } @entry_objects ;
+    }
+    else {
+    	@sorted = @entry_objects;
+    }
+#    print Dumper @sorted ;
+    return(\@sorted, \$nb_entries) ;
 }
 ## END of SUB
 
@@ -202,15 +216,12 @@ sub get_cluster_object {
     		
     		push (@pre_clustering, \%cluster) ;
     	}
-    	
     	## Pool cluster objects by cluster name
 	    $clusters_object = $self->pool_cluster_objects(\@pre_clustering) ;
-    	
     }
     else {
     	croak "Can't manage a an empty entries result and produce a cluster object\n" ;
     }
-    
     return($clusters_object) ;
 }
 ## END of SUB
@@ -394,21 +405,47 @@ sub parse_lm_common_name {
     if (defined $common_name) {
 		if( $common_name =~ /\s/ ) { 		$common_name =~ s/ //g ;  	} ## del all spaces		
 		my @matches = (undef) ; # init first position at undef to manage undef regex
-		
+		my %matching_res = () ;
 		## Goals :
 		## - use each parsing rule on the common name 
 		## - extrat the 9 values containing in the common name (value can be undef)
 		## - translate initialized $Gp1, $Gp2, $Gp3, $Ch1_C, $Ch1_i, $Ch2_C, $Ch2_i, $Ch3_C, $Ch3_i, $Ox, $Post values by real ones (ex; 0 => PE, or 0-1-4 => PS-O-P) 
+#		print "\n\nCOMMON_NAME=".$common_name."\n" ;
 		foreach my $rule (keys %{$RULES} ) {
 			$rule =~ m/^RULE(\d+)/ ;
 			$rule_nb = $1 ;
 			push ( @matches, ($common_name =~ m/$RULES->{$rule}/g) ) ; # catch all matches in the regex
-			
+#			print "\nUsing - RULE -> $rule_nb\n" ;
+#			print Dumper @matches ;
+#			print "\n- - - - - - - - - - - - - \n" ;
 			my ($v1, $v2, $v3, $v4, $v5, $v6, $v7, $v8, $v9, $v10, $v11 ) = split(/,/, $RECIPES->{'RECIPE'.$rule_nb}) ;
+#			print "($v1, $v2, $v3, $v4, $v5, $v6, $v7, $v8, $v9, $v10, $v11 )\n" ;
 			( $Gp1, $Gp2, $Gp3 ) = ( $matches[$v1], $matches[$v2], $matches[$v3] ) ;
 			( $Ch1_C, $Ch1_i, $Ch2_C, $Ch2_i, $Ch3_C, $Ch3_i ) = ( $matches[$v4], $matches[$v5], $matches[$v6], $matches[$v7], $matches[$v8], $matches[$v9] ) ;
 			( $Ox, $Post ) = ( $matches[$v10], $matches[$v11] ) ;
-			if (scalar (@matches) > 1) { last ; } # get out of the loop
+			
+#			if (scalar (@matches) > 1) { last ; } # get out of the loop
+			## Add a method to manage several rules matching
+			$matching_res{$rule} = [$Gp1, $Gp2, $Gp3, $Ch1_C, $Ch1_i, $Ch2_C, $Ch2_i, $Ch3_C, $Ch3_i, $Ox, $Post]  ;
+			( $Gp1, $Gp2, $Gp3, $Ch1_C, $Ch1_i, $Ch2_C, $Ch2_i, $Ch3_C, $Ch3_i, $Ox, $Post ) = ( undef, undef, undef, undef, undef, undef, undef, undef, undef, undef, undef) ;
+			($v1, $v2, $v3, $v4, $v5, $v6, $v7, $v8, $v9, $v10, $v11 ) = ( undef, undef, undef, undef, undef, undef, undef, undef, undef, undef, undef) ;
+			@matches = (undef) ;
+		}
+		
+		## foreach parsed rules - get the best
+		my $best_rule_is = undef ;
+		my ( $current_nb, $best_nb) = ( 0, 0 ) ;
+		foreach my $rule_nb (keys %matching_res) {
+			$current_nb = scalar grep { defined $_ } @{$matching_res{$rule_nb}};
+			if ( $current_nb > $best_nb ) { $best_nb = $current_nb ; $best_rule_is = $rule_nb ; }
+		}
+		
+		if ( defined $best_rule_is ) {
+#			print "The best rule is : $best_rule_is\n" ;
+			my @tmp = @{$matching_res{$best_rule_is}} ;
+#			print Dumper @tmp ;
+			( $Gp1, $Gp2, $Gp3, $Ch1_C, $Ch1_i, $Ch2_C, $Ch2_i, $Ch3_C, $Ch3_i, $Ox, $Post ) = (  $tmp[0], $tmp[1], $tmp[2], $tmp[3], $tmp[4], $tmp[5], $tmp[6], $tmp[7], $tmp[8], $tmp[9], $tmp[10] ) ;
+#			print "$Gp1, $Gp2, $Gp3, $Ch1_C, $Ch1_i, $Ch2_C, $Ch2_i, $Ch3_C, $Ch3_i, $Ox, $Post\n" ;
 		}
     }
     else {
@@ -534,9 +571,10 @@ sub pool_cluster_objects {
     
     my @pools = () ;
     my %sort = () ;
+    my @deltas = () ;
     
     # prerequis for the first iteration 
-    my $ref_common_name = 'NONE' ; 
+    my $ref_common_name = 'NONE' ;
     
     # sort entries by cluster with a key hash system
     foreach my $object (@{$cluster_objects}) {
@@ -545,8 +583,9 @@ sub pool_cluster_objects {
     	
     	## prepare data
     	if (  !defined $sort{$$q_name}{ENTRY_IDS} ) {
-    		 $sort{$$q_name}{ENTRY_IDS} = [] ; 
-    		 $sort{$$q_name}{NB_ENTRIES_FOR_CLUSTER} = 1 ;
+    		$sort{$$q_name}{ENTRY_IDS} = [] ;
+    		$sort{$$q_name}{ENTRY_DELTAS} = [] ;
+    		$sort{$$q_name}{NB_ENTRIES_FOR_CLUSTER} = 1 ;
     	}
     	else {
     		$sort{$$q_name}{NB_ENTRIES_FOR_CLUSTER} = ($sort{$$q_name}{NB_ENTRIES_FOR_CLUSTER}) + 1 ;
@@ -556,22 +595,50 @@ sub pool_cluster_objects {
     	if ( $$q_name ne $ref_common_name ) {
     		$sort{$$q_name}{CLUSTER_NAME} = $q_name ;
     		push ( @{ $sort{$$q_name}{ENTRY_IDS} }, $current{ENTRY_IDS} ) ;
+    		push ( @{ $sort{$$q_name}{ENTRY_DELTAS} }, $current{CLUSTER_DELTA} ) ;
     	}
     	else {
 			push ( @{ $sort{$$q_name}{ENTRY_IDS} }, $current{ENTRY_IDS} ) ;
+			push ( @{ $sort{$$q_name}{ENTRY_DELTAS} }, $current{CLUSTER_DELTA} ) ;
 			next ;
 		}
+		
 		## set rest of features
 		$sort{$$q_name}{FORMULA} = $current{FORMULA} ;
 		$sort{$$q_name}{ISOTOPIC_RATIO} = $current{ISOTOPIC_RATIO} ;
-		$sort{$$q_name}{CLUSTER_DELTA} = $current{CLUSTER_DELTA} ;
+#		$sort{$$q_name}{CLUSTER_DELTA} = $current{CLUSTER_DELTA} ;
     	
 		$ref_common_name = $$q_name ;
     }
+     
     # and pool them
-    foreach ( keys %sort ) { push (@pools, $sort{$_}) ;  }
+    foreach ( keys %sort ) {
+    	
+    	## sort IDS
+		my @tmp = @{ $sort{$_}{ENTRY_IDS} } ;
+		my @tmp_unref = () ;
+		my @sort_unref = () ;
+		my @sort_ref = () ;
+
+		foreach (@tmp) { my $id = $$_ ; 	push (@tmp_unref, $id) ; }
+		@sort_unref = sort {  $a cmp $b } @tmp_unref ;
+		foreach (@sort_unref) { my $id = $_ ; 	push (@sort_ref, \$id) ; }
+		$sort{$_}{ENTRY_IDS} = \@sort_ref ;
+		
+		## sort delta and init the smallest for the cluster
+		my @tmp_deltas = @{ $sort{$_}{ENTRY_DELTAS} } ;
+		my @tmp_delta_sorted = () ;
+		@tmp_delta_sorted = sort { $a <=> $b } @tmp_deltas ;
+		$sort{$_}{CLUSTER_DELTA} = $tmp_delta_sorted[0] ;
+		
+		## get all    	
+       	push (@pools, $sort{$_}) ;  
+    }
     
-    return(\@pools) ;
+	## sort by nb of entries in the cluster
+    my @pool_sorted = sort { $b->{NB_ENTRIES_FOR_CLUSTER} <=> $a->{NB_ENTRIES_FOR_CLUSTER} } @pools ;
+
+    return(\@pool_sorted) ;
 }
 ## END of SUB
 
