@@ -1,10 +1,22 @@
-<tool id="lipidmaps" name="Lipidmaps " version="2014-05-07">
+<tool id="lipidmaps" name="Lipidmaps " version="2016-09-27">
 	<description> 
-		 : search on LM online with masses
+		 : search on LIPID MAPS Structure Database (LMSD) online with masses and its Text/Ontology-based search engine.
 	</description>
-	<command interpreter="perl">
-		wsdl_lipidmaps.pl
-		-input $file_input -lineheader $lineheader -colmass $col_mass -colrt $col_rt -decimal $decimal -round $round_type -delta $tolerance
+	<requirements>
+		<requirement type="package" version="0.413">perl-list-moreutils</requirement>
+		<requirement type="package" version="1.33">perl-text-csv</requirement>
+		<requirement type="package" version="2.95">perl-html-template</requirement>
+		<requirement type="package" version="3.49">perl-xml-twig</requirement>
+		<requirement type="package" version="6.15">perl-lwp-simple</requirement>
+		<requirement type="package" version="6.15">perl-libwww-perl</requirement>
+		<requirement type="package" version="1.9728">perl-time-hires</requirement>
+	</requirements>
+	<stdio>
+    	<exit_code level="fatal" range="1"/>
+  	</stdio>
+  	<command><![CDATA[
+		perl $__tool_directory__/wsdl_lipidmaps.pl
+		-input $file_input -lineheader $lineheader -colmass $col_mass -decimal $decimal -round $round_type -delta $tolerance -mode $mode
 		
 		#if str($query_type.complex_query_action) == "no" :
 			-cat "${query_type.select_cat.filter_cat}"
@@ -19,15 +31,19 @@
 			-listneutralloss ${data_type.neutral_loss} -listoxidation ${data_type.oxidation}
 		#end if
 		
-		-output $variableMetadata -view $LMSDResView
+		-output $variableMetadata_out -view $LMSDOutWeb
 		
-	</command>
+	]]></command>
 	<inputs>
 		<param name="file_input" label="File of masses (Variable Metadata) " format="tabular" type="data" help="A tabular/csv file is needed and can contains a header line."/>
 		<param name="lineheader" label="Number of header lines " type="integer" value="0" size="10" help="number of lines not containing values"/>
 		<param name="col_mass" label="Masses Column " type="data_column" data_ref="file_input" accept_default="true" help="select the column in your input file."/>
-		<param name="col_rt" label="Retention time Column " type="data_column" data_ref="file_input" accept_default="true" help="select the column in your input file."/>
-		<!-- Data type : modified or initial -->
+		<param name="mode" label="Ionisation mode of your submitted data " type="select" help="Please be aware !!! This service of LipidMaps uses Neutral mass -  If you need to transform your masses for the query, please select the ionisation mode (positive or negative) of your instrument- This operation is really pertinent only if yours masses corresponding to [M+H]+ or [M-H]- species">
+				<option value="POS">Positive</option>
+				<option value="NEG">Negative</option>
+				<option value="NEU" selected="True">Neutral</option>
+		</param>
+		<!--<param name="col_rt" label="Retention time Column " type="data_column" data_ref="file_input" accept_default="true" help="select the column in your input file."/>-->
 		<conditional name="data_type">
 			<param name="modify_data_action" label="Do you want to modify input masses ? " type="select" help="Posibility to apply oxidation(s) and/or neutral loss(es).">
 				<option value="yes">yes</option>
@@ -1623,16 +1639,16 @@
 		<param name="tolerance" label="Mass-to-charge ratio " type="float" min="0" max="100" value="0.5" size="10" help="Default value is 0.5 for LM (mass-to-charge ratio)" />
 	</inputs>
 	<outputs>
-		<data name="variableMetadata" format="tabular"  label="${tool.name}_TSV"/>
-		<data name="LMSDResView" format="HTML"  label="${tool.name}_VIEW"/>
+		<data name="variableMetadata_out" format="tabular"  label="${file_input.name[:-6]}.LMSD.tabular"/>
+		<data name="LMSDOutWeb" format="html"  label="${file_input.name[:-6]}.LMSD_WEB.html"/>
 	</outputs>
 	<tests>
   	<test>
   		<!--test 01 some results - input01_50_without_class.csv -->
   		<param name="file_input" value="input01_50_without_class.csv"/>
+  		<param name="mode" value="NEU"/>
   		<param name="lineheader" value="1"/>
   		<param name="col_mass" value="3"/>
-  		<param name="col_rt" value="1"/>
   		<param name="tolerance" value="0.5"/>
   		<param name="decimal" value="2"/>
   		<param name="round_type" value="round"/>
@@ -1640,29 +1656,29 @@
   		<param name="filter_cat" value="3"/>
   		<param name="filter_class" value="306"/>
   		<param name="filter_subclass" value="NA_306"/>
-  		<output name="variableMetadata" file="out_test01.tabular"/>
-  		<output name="LMSDResView" file="out_test01.html"/>
+  		<output name="variableMetadata_out" file="out_test01.tabular"/>
+  		<output name="LMSDOutWeb" file="out_test01.html"/>
   	</test>
   	<test>
   		<!--test 02 : some results - input02_480_several_class.csv file-->
   		<param name="file_input" value="input02_480_several_class.csv"/>
+  		<param name="mode" value="NEU"/>
   		<param name="lineheader" value="1"/>
   		<param name="col_mass" value="1"/>
-  		<param name="col_rt" value="2"/>
   		<param name="tolerance" value="0.5"/>
   		<param name="decimal" value="2"/>
   		<param name="round_type" value="round"/>
   		<param name="complex_query_action" value="yes"/>
   		<param name="col_classif_id" value="3"/>
-  		<output name="variableMetadata" file="out_test02.tabular"/>
-  		<output name="LMSDResView" file="out_test02.html"/>
+  		<output name="variableMetadata_out" file="out_test02.tabular"/>
+  		<output name="LMSDOutWeb" file="out_test02.html"/>
   	</test>
   	<test>
   		<!--test 03 : some results - input03_200_without_class_on_maincl_301.csv file-->
   		<param name="file_input" value="input03_200_without_class_on_maincl_301.csv"/>
+  		<param name="mode" value="NEU"/>
   		<param name="lineheader" value="1"/>
   		<param name="col_mass" value="1"/>
-  		<param name="col_rt" value="2"/>
   		<param name="complex_query_action" value="no"/>
   		<param name="filter_cat" value="3"/>
   		<param name="filter_class" value="301"/>
@@ -1670,11 +1686,27 @@
   		<param name="tolerance" value="0.5"/>
   		<param name="decimal" value="2"/>
   		<param name="round_type" value="round"/>
-  		<output name="variableMetadata" file="out_test03.tabular"/>
-  		<output name="LMSDResView" file="out_test03.html"/>
+  		<output name="variableMetadata_out" file="out_test03.tabular"/>
+  		<output name="LMSDOutWeb" file="out_test03.html"/>
+  	</test>
+  	<test>
+  		<!--test 04 some results and mz transfo with the mode - input01_50_without_class.csv -->
+  		<param name="file_input" value="input01_50_without_class.csv"/>
+  		<param name="mode" value="POS"/>
+  		<param name="lineheader" value="1"/>
+  		<param name="col_mass" value="3"/>
+  		<param name="tolerance" value="0.5"/>
+  		<param name="decimal" value="2"/>
+  		<param name="round_type" value="round"/>
+  		<param name="complex_query_action" value="no"/>
+  		<param name="filter_cat" value="3"/>
+  		<param name="filter_class" value="306"/>
+  		<param name="filter_subclass" value="NA_306"/>
+  		<output name="variableMetadata_out" file="out_test04.tabular"/>
+  		<output name="LMSDOutWeb" file="out_test04.html"/>
   	</test>
   </tests>
-	  <help>
+	  <help><![CDATA[
 
 .. class:: infomark
 
@@ -1726,7 +1758,6 @@ Input files
 
 Constraints file : 
 	* a column with mz
-	* a column with rt
 	* a column with containing category or class or sub class identifiants. [optionnal]
 
 
@@ -1738,16 +1769,16 @@ Masses Column
 	| mz list using in searches.
 	| Each mz will be arround or truncate and querying to LMSD.
 
-
-Retention time Column
-	| rt list not using in searches.
-
+Mode 
+	| Ionisation mode of the instrument (Positive/Negative or neutral)
+	| Selecting POS or NEG will transform the given mz list into a neutral mz list permitting the use of LMSD with the right format. Actually, LMSD take neutral masses as query.
+	| Be aware to use this option. The transformation is really pertinent for only masses corresponding to [M+H]+ or [M-H]- species
+	| Example of transformation: initial mz from positive mode is 101.008374 and will become 100,000000 (init mass - proton mass + electron mass) if POS option is selected.
 
 Modify input masses
 	| Select posibility to apply oxidation(s) and/or neutral loss(es)
 	| Example : if you apply a oxidation (+ O) on a mz = 800.00, the mass search on LMSD will be 800.00 - 15.99. 
 	| A LM return will be : LMGP01010622	PC(16:0/20:3(5Z,8Z,11Z)) C44H82NO8P 783.58 but do not forget to add a Oxigen... 
-
 
 Transform masses extracted from file with oxidation(s)
 	| Choose  : + O, + 2 O, + 4 O.
@@ -1782,13 +1813,10 @@ Delta of mass
 Output files
 ------------
 
-lipidmaps_TSV.tabular
-	| the input file with adding lipidmaps results organized by cluster like
-	| delta::Cluster_common_name::Formula::Example_of_LM_id\|...
-	| Example 0.21::(-)::(C42H80NO6P)::LMGP01040094\|0.14::(PC_32:4)::(C40H72NO8P)::LMGP01010499\|0.20::(PC-O_30:0)+H2O2::(C38H78NO7P)+H2O2::LMGP01020012\|
+Two types of files
 
-lipidmaps_VIEW.html
-	| A very complete LM results output with clusters.
+	| LMSD_WEB.html: for viewing result via HTML.
+	| LMSD.tabular: for linking with others modules.
 
 	
 ---------------
@@ -1808,5 +1836,9 @@ And their "W4M courses 2015":
  | Using Galaxy4Metabolomics - W4M table format for Galaxy
  | Les banques d'annotation - Annotation  
 
-	</help>
+	]]></help>
+	<!-- [RECOMMANDED] All citations associated to this tool (main citation given above and other references). Can be extracted from the history panel -->
+	<citations>
+		<citation type="doi">10.1093/nar/gkl838</citation>
+	</citations>
 </tool>

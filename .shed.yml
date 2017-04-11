@@ -1,0 +1,7 @@
+categories: [Metabolomics]
+name: lipidmaps_textsearch
+owner: fgiacomoni
+description: '[W4M][LC-MS] LIPID MAPS Structure Database (LMSD) - Annotation - Returns annotation results from LIPID MAPS Structure Database and its Text/Ontology-based search engine.'
+homepage_url: http://workflow4metabolomics.org
+long_description: 'Part of the W4M project: http://workflow4metabolomics.org / LMSD: http://www.lipidmaps.org. The wrapper script use the LipidMaps Text/Ontology-based search resource to annotate a list of m/z. The process returns output files (tabular and HTML formats) with links through lipid records.'
+remote_repository_url: https://github.com/workflow4metabolomics/tool-bank-lipidmaps.git

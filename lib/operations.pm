@@ -10,8 +10,8 @@ use vars qw($VERSION @ISA @EXPORT %EXPORT_TAGS);
 
 our $VERSION = "1.0";
 our @ISA = qw(Exporter);
-our @EXPORT = qw( get_factorial truncate_num truncate_nums round_num round_nums );
-our %EXPORT_TAGS = ( ALL => [qw( get_factorial truncate_num truncate_nums round_num round_nums )] );
+our @EXPORT = qw( get_factorial truncate_num truncate_nums round_num round_nums manage_mode );
+our %EXPORT_TAGS = ( ALL => [qw( get_factorial truncate_num truncate_nums round_num round_nums manage_mode )] );
 
 =head1 NAME
 
@@ -78,6 +78,47 @@ sub get_factorial {
 	}
 	
 	return ($factorial) ; # renvoi de la valeur
+}
+## END of SUB
+
+=head2 METHOD manage_mode
+
+	## Description : manage mode and apply mass correction (positive/negative/neutral)
+	## Input : $mode, $charge, $electron, $proton, $mass
+	## Output : $exact_mass
+	## Usage : my ( $exact_mass ) = manage_mode( $mode, $charge, $electron, $proton, $mass ) ;
+	
+=cut
+## START of SUB
+sub manage_mode {
+	## Retrieve Values
+    my $self = shift ;
+    my ( $mode, $charge, $electron, $proton, $mass ) = @_ ;
+    my ($exact_mass, $tmp_mass) = ( undef, undef ) ;
+    
+    ## some explanations :
+    	# MS in + mode = adds H+ (proton) and molecule is positive : el+ => $charge = "positive"
+		# For HR, need to subtrack proton mz and to add electron mz (1 electron per charge) to the input mass which comes neutral!
+    
+    if ( ( defined $$electron ) and ( defined $$proton ) ) {
+    	# check mass
+    	if ( defined $$mass ) {  $tmp_mass = $$mass ;   $tmp_mass =~ tr/,/./ ; } # manage . and , in case of...
+    	else {	warn "No mass is defined\n"  	}
+    	
+    	# manage charge
+    	if ( ( !defined $$charge ) || ($$charge < 0) ){ warn "Charge is not defined or value is less than zero\n" ; }
+    	
+    	# set neutral mass in function of ms mode
+    	if($$mode eq 'POS')	{	$exact_mass = (	$tmp_mass - $$proton + $$electron) * $$charge ; }
+    	elsif($$mode eq 'NEG')	{ 	$exact_mass = (	$tmp_mass + $$proton - $$electron) * $$charge ; }
+    	elsif($$mode eq "NEU")	{	$exact_mass = 	$tmp_mass ;  }
+	    else { 	warn "This mode doesn't exist : please select positive/negative or neutral mode\n" ; 	    }
+    }
+    else {
+    	warn "Missing some parameter values (electron, neutron masses), please check your conf file\n" ;
+    }
+#    print "$tmp_mass -> $exact_mass ($$mode) \n" ;
+    return(\$exact_mass) ;
 }
 ## END of SUB
 

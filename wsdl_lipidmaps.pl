@@ -33,59 +33,39 @@ use lib::operations  qw( :ALL ) ;
 
 ## Initialized values
 #
-my $version = '1.1';
-my ( $help, $input_file, $line_header, $col_mass, $col_rt, $decimal, $round_type, $delta ) = ( undef, undef, undef, undef, undef, undef, undef, undef ) ; 
-my ( $list_oxidation, $list_neutral_loss ) = ( undef, undef, undef ) ; 
+my $version = '1.2';
+my ( $help, $input_file, $line_header, $col_mass, $col_rt, $decimal, $round_type, $delta, $mode ) = ( undef, undef, undef, undef, undef, undef, undef, undef, undef ) ; 
+my ( $list_oxidation, $list_neutral_loss ) = ( undef, undef ) ; 
 my ( $col_classif_id, $selected_cat, $selected_cl, $selected_subcl ) = ( undef, undef, undef, undef ) ; 
-my ( $output_csv_file, $output_html_file, $output_link_file  ) = ( undef, undef, undef ) ;
-my $verbose = 3; 
+my ( $output_csv_file, $output_html_file  ) = ( undef, undef ) ;
 
-# for test ONLY !
-#( $input_file, $line_header, $col_mass, $col_rt, $decimal, $round_type, $delta )  = ('/Users/fgiacomoni/Inra/labs/tests/galaxy/lipidmaps/test_lipidmaps_avec_class_short.csv', 1, 2, 3, 2, 'round', 0.5 ) ;
-#( $list_oxidation, $list_neutral_loss ) = ( 'loss_O,loss_2O,NA', 'loss_hydroperoxide,loss_water' ) ;
-#( $list_oxidation, $list_neutral_loss ) = ( 'NA','NA,loss_hydroperoxide,loss_water' ) ;
-#( $selected_cat, $selected_cl, $selected_subcl ) = ( 3, 301, 30103 ) ;
-#( $selected_cat, $selected_cl, $selected_subcl ) = ( 3, 'NA_3', 'NA_301' ) ;
-#( $col_classif_id ) = 4 ;
-#( $output_html_file ) = ('/Users/fgiacomoni/Inra/labs/tests/galaxy/lipidmaps/lm.html') ;
-#( $output_csv_file ) = ('/Users/fgiacomoni/Inra/labs/tests/galaxy/lipidmaps/lm.csv') ;
+## Verbose levels (1 OR 3)
+my $verbose = 3 ; 
+
 
 &GetOptions ( 	"help|h"     		=> \$help,       		# HELP
 				"input|i:s"			=> \$input_file,		# path for input file (CSV format) -- Mandatory
 				"lineheader:i"		=> \$line_header, 		## header presence in tabular file
 				"colmass:i"			=> \$col_mass,			# Input file Column containing Masses for query -- Mandatory
-				"colrt:i"			=> \$col_rt,			# Input file Column containing Retention time
+#				"colrt:i"			=> \$col_rt,			# Input file Column containing Retention time
 				"decimal:i"			=> \$decimal	,		# Significante decimal on mass -- Mandatory
 				"listoxidation:s"	=> \$list_oxidation,	## option : liste des atomes a gerer sur les masses experimentales
 				"listneutralloss:s"	=> \$list_neutral_loss,	## option : liste des atomes a gerer sur les masses experimentales
 				"round:s" 			=> \$round_type,		# Type of truncation -- Mandatory
 				"delta:f" 			=> \$delta,				# delta of mass -- Mandatory
-				"cat:i" 			=> \$selected_cat,		# Number corresponding to the main category in LIPIDMAPS -- Optional
-				"class:i"			=> \$selected_cl,		# Number corresponding to the main classe in LIPIDMAPS -- Optional
-				"subclass:i"		=> \$selected_subcl,	# Number corresponding to the sub class in LIPIDMAPS -- Optional
+				"cat:s" 			=> \$selected_cat,		# Number corresponding to the main category in LIPIDMAPS -- Optional
+				"class:s"			=> \$selected_cl,		# Number corresponding to the main classe in LIPIDMAPS -- Optional
+				"subclass:s"		=> \$selected_subcl,	# Number corresponding to the sub class in LIPIDMAPS -- Optional
 				"output:s"			=> \$output_csv_file,	# File+Path for the results (CVS) -- Mandatory
 				"view:s"			=> \$output_html_file,	# File+Path for the view results (HTML) -- Mandatory
 				"colclassif:i"		=> \$col_classif_id,	# Input file Column containing LM classes ID for query -- Optional
+				"mode:s"			=> \$mode,				# mode of the initial data
             ) ;
 
 #=============================================================================
 #                                EXCEPTIONS
 #=============================================================================
 $help and &help ;
-
-## CMD LINE IN GALAXY :
-#wsdl_lipidmaps.pl -input $file_input -colmass $col_mass -colrt $col_rt -decimal $decimal -round $round_type -delta $tolerance
-##if $query_type.complex_query_action=="no" :
-#	-cat $query_type.select_cat.filter_cat -class $query_type.select_cat.select_class.filter_class -subclass $query_type.select_cat.select_class.select_subclass.filter_subclass
-#	#if data_type.modify_data_action=="yes" :
-#		-listneutralloss $neutral_loss -listoxidation $oxidation
-#	#end if
-##else :
-#	#if data_type.modify_data_action=="yes" :
-#	 -colclassif $query_type.col_classif_id -listneutralloss $neutral_loss -listoxidation $oxidation
-#	#end if
-##end if
-#-output $output_result -view $output_view
 
 ## --------------- Global parameters ---------------- :
 my $nb_pages_for_html_out = 1 ;
@@ -133,12 +113,33 @@ if ( ( defined $input_file ) and ( -e $input_file ) ) {
 	## parse masses
 	if ( defined $col_mass ) {
 		print "[INFO] Get masses from input file $input_file ...\n" if ($verbose == 3);
-		print "[INFO] Get RT from input file $input_file ...\n" if ($verbose == 3);
+#		print "[INFO] Get RT from input file $input_file ...\n" if ($verbose == 3);
 		my $ocsv = lib::csv->new() ;
 		my $csv = $ocsv->get_csv_object( "\t" ) ;
 		$init_mzs = $ocsv->get_value_from_csv_multi_header( $csv, $input_file, $col_mass, $is_header, $line_header ) ; ## retrieve mz values on csv
-		$init_rts = $ocsv->get_value_from_csv_multi_header( $csv, $input_file, $col_rt, $is_header, $line_header ) ; ## retrieve rt values on csv
+#		$init_rts = $ocsv->get_value_from_csv_multi_header( $csv, $input_file, $col_rt, $is_header, $line_header ) ; ## retrieve rt values on csv
 	}
+	
+	## Adjust the mz to the instrument mode (POS/NEG)
+	if ( ( defined $mode ) and ( ($mode eq 'POS') or ($mode eq 'NEG') ) ) {
+		print "\t [INFO] Apply mass mode transforming (POS to NEU or NEG to NEU) ...\n" if ($verbose == 3);
+		my @mode_init_mzs = () ;
+		my $omode = lib::operations::new() ;
+		foreach my $mz (@$init_mzs) {
+			push (@mode_init_mzs, ${$omode->manage_mode(\$mode, \1, \0.0005486, \1.007825, \$mz)} ) ;
+		}
+		
+		if ( (scalar @$init_mzs) == (scalar @mode_init_mzs) ) {
+			$init_mzs = \@mode_init_mzs ;
+		}
+		else {
+			carp "[ERROR] The mode managing process failed and init mzs have been corrompted\n"
+		}
+	}
+	else {
+		print "\t [INFO] Apply no mass mode transforming\n" if ($verbose == 3);
+	}
+	
 	## round masses
 	if ( ( defined $round_type ) and ( defined $decimal ) ) {
 		print "\t [INFO] Apply mass rounding ...\n" if ($verbose == 3);
@@ -154,6 +155,8 @@ if ( ( defined $input_file ) and ( -e $input_file ) ) {
 		my $csv = $ocsv->get_csv_object( "\t" ) ;
 		$classif_ids = $ocsv->get_value_from_csv( $csv, $input_file, $col_classif_id, $is_header, $line_header ) ;
 	}
+	
+	
 	
 	## Uses N mz and theirs entries per page (see config file).
 	# how many pages you need with your input mz list?
@@ -300,10 +303,13 @@ if ( defined $output_html_file) {
 	
 	my $ohtml = lib::writer->new() ;
 	$tbody_object = $ohtml->set_html_tbody_object( $nb_pages_for_html_out ) ;
-	$tbody_object = $ohtml->add_mz_to_tbody_object( $tbody_object, $CONF->{HTML_ENTRIES_PER_PAGE}, $init_mzs, $init_rts, \@entries_total_nb) ;
+	$tbody_object = $ohtml->add_mz_to_tbody_object( $tbody_object, $CONF->{HTML_ENTRIES_PER_PAGE}, $init_mzs, \@entries_total_nb) ;
 	$tbody_object = $ohtml->add_transformation_to_tbody_object( \@transfo_init_mzs, \@transfo_annotations, $tbody_object ) ;
 	$tbody_object = $ohtml->add_cluster_to_tbody_object( \@transfo_init_mzs, \@clusters_results, $tbody_object ) ;
-	$tbody_object = $ohtml->add_entry_to_tbody_object( \@transfo_init_mzs, \@clusters_results, \@entries_results, $tbody_object ) ;	
+	$tbody_object = $ohtml->add_entry_to_tbody_object( \@transfo_init_mzs, \@clusters_results, \@entries_results, $tbody_object ) ;
+	
+	$tbody_object = $ohtml->sort_tbody_object($tbody_object) ;
+	
 	my $output_html = $ohtml->write_html_skel(\$output_html_file, $tbody_object, $nb_pages_for_html_out, $CONF->{'HTML_TEMPLATE'}, $CONF->{'JS_GALAXY_PATH'}, $CONF->{'CSS_GALAXY_PATH'}) ;
 }
 
@@ -311,7 +317,7 @@ if ( defined $output_html_file) {
 #write csv ouput : add 'lipidmaps' column to input file
 my $lm_matrix = undef ;
 my $ocsv = lib::writer->new() ;
-if ( defined $is_header ) { $lm_matrix = $ocsv->set_lm_matrix_object('lipidmaps', $init_mzs, \@transfo_annotations, \@clusters_results ) ;	}
+if ( defined $is_header ) { $lm_matrix = $ocsv->set_lm_matrix_object('LIPIDMAPS(score::name::mz::formula::adduct::id)', $init_mzs, \@transfo_annotations, \@clusters_results ) ;	}
 else { $lm_matrix = $ocsv->set_lm_matrix_object( undef, $init_mzs, \@transfo_annotations, \@clusters_results ) ;	}
 
 
