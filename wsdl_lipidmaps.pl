@@ -33,22 +33,15 @@ use lib::operations  qw( :ALL ) ;
 
 ## Initialized values
 #
-my $version = '1.1';
+my $version = '1.2';
 my ( $help, $input_file, $line_header, $col_mass, $col_rt, $decimal, $round_type, $delta, $mode ) = ( undef, undef, undef, undef, undef, undef, undef, undef, undef ) ; 
-my ( $list_oxidation, $list_neutral_loss ) = ( undef, undef, undef ) ; 
+my ( $list_oxidation, $list_neutral_loss ) = ( undef, undef ) ; 
 my ( $col_classif_id, $selected_cat, $selected_cl, $selected_subcl ) = ( undef, undef, undef, undef ) ; 
-my ( $output_csv_file, $output_html_file, $output_link_file  ) = ( undef, undef, undef ) ;
-my $verbose = 1; 
+my ( $output_csv_file, $output_html_file  ) = ( undef, undef ) ;
 
-# for test ONLY !
-#( $input_file, $line_header, $col_mass, $col_rt, $decimal, $round_type, $delta )  = ('/Users/fgiacomoni/Inra/labs/tests/galaxy/lipidmaps/test_lipidmaps_avec_class_short.csv', 1, 2, 3, 2, 'round', 0.5 ) ;
-#( $list_oxidation, $list_neutral_loss ) = ( 'loss_O,loss_2O,NA', 'loss_hydroperoxide,loss_water' ) ;
-#( $list_oxidation, $list_neutral_loss ) = ( 'NA','NA,loss_hydroperoxide,loss_water' ) ;
-#( $selected_cat, $selected_cl, $selected_subcl ) = ( 3, 301, 30103 ) ;
-#( $selected_cat, $selected_cl, $selected_subcl ) = ( 3, 'NA_3', 'NA_301' ) ;
-#( $col_classif_id ) = 4 ;
-#( $output_html_file ) = ('/Users/fgiacomoni/Inra/labs/tests/galaxy/lipidmaps/lm.html') ;
-#( $output_csv_file ) = ('/Users/fgiacomoni/Inra/labs/tests/galaxy/lipidmaps/lm.csv') ;
+## Verbose levels (1 OR 3)
+my $verbose = 3 ; 
+
 
 &GetOptions ( 	"help|h"     		=> \$help,       		# HELP
 				"input|i:s"			=> \$input_file,		# path for input file (CSV format) -- Mandatory
@@ -73,20 +66,6 @@ my $verbose = 1;
 #                                EXCEPTIONS
 #=============================================================================
 $help and &help ;
-
-## CMD LINE IN GALAXY :
-#wsdl_lipidmaps.pl -input $file_input -colmass $col_mass -colrt $col_rt -decimal $decimal -round $round_type -delta $tolerance
-##if $query_type.complex_query_action=="no" :
-#	-cat $query_type.select_cat.filter_cat -class $query_type.select_cat.select_class.filter_class -subclass $query_type.select_cat.select_class.select_subclass.filter_subclass
-#	#if data_type.modify_data_action=="yes" :
-#		-listneutralloss $neutral_loss -listoxidation $oxidation
-#	#end if
-##else :
-#	#if data_type.modify_data_action=="yes" :
-#	 -colclassif $query_type.col_classif_id -listneutralloss $neutral_loss -listoxidation $oxidation
-#	#end if
-##end if
-#-output $output_result -view $output_view
 
 ## --------------- Global parameters ---------------- :
 my $nb_pages_for_html_out = 1 ;
